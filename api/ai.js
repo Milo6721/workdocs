@@ -7,7 +7,7 @@
 
 const SYSTEM = `Jesteś asystentem AI wbudowanym w Work Docs — tablicę do nauki (diagramy, mapy myśli, schematy blokowe, wykresy, tabele, karteczki).
 Użytkownik pisze polecenie. W kontekście dostajesz: selection (zaznaczone elementy) albo board (elementy tablicy z tekstem) oraz links (istniejące połączenia from→to).
-ZAWSZE odpowiadaj, wywołując narzędzie update_board.
+ZAWSZE odpowiadaj, wywołując narzędzie update_board (dokładnie jedno wywołanie, bez tekstu poza narzędziem).
 
 Zasady:
 - Odpowiadaj w języku użytkownika (domyślnie po polsku).
@@ -164,9 +164,9 @@ module.exports = async function handler(req, res) {
       }),
       signal: ctrl.signal
     });
-    let r = await call({ type: 'tool', name: 'update_board' });
-    // Niektóre modele odrzucają wymuszone użycie narzędzia (400) — ponów w trybie auto.
-    if (r.status === 400) r = await call({ type: 'auto' });
+    // Część modeli nie wspiera wymuszania narzędzia (tool_choice "tool"/"any"), więc używamy "auto".
+    // Instrukcja systemowa nakazuje zawsze wywołać update_board; odpowiedź tekstowa jest obsłużona niżej.
+    const r = await call({ type: 'auto' });
     if (!r.ok) {
       const map = { 401: 'Serwer ma nieprawidłowy klucz API.', 429: 'Limit zapytań do AI — spróbuj za chwilę.', 529: 'AI jest przeciążone — spróbuj za chwilę.' };
       let detail = '';
