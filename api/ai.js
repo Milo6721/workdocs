@@ -151,7 +151,7 @@ module.exports = async function handler(req, res) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 55000);
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const call = (toolChoice) => fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
@@ -159,11 +159,14 @@ module.exports = async function handler(req, res) {
         max_tokens: 4096,
         system: SYSTEM,
         tools: [TOOL],
-        tool_choice: { type: 'tool', name: 'update_board' },
+        tool_choice: toolChoice,
         messages: [{ role: 'user', content: user }]
       }),
       signal: ctrl.signal
     });
+    let r = await call({ type: 'tool', name: 'update_board' });
+    // Niektóre modele odrzucają wymuszone użycie narzędzia (400) — ponów w trybie auto.
+    if (r.status === 400) r = await call({ type: 'auto' });
     if (!r.ok) {
       const map = { 401: 'Serwer ma nieprawidłowy klucz API.', 429: 'Limit zapytań do AI — spróbuj za chwilę.', 529: 'AI jest przeciążone — spróbuj za chwilę.' };
       let detail = '';
