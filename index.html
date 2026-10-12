@@ -186,7 +186,34 @@ body.present #exitPresent{display:inline-flex}
 #ctx .dirs button{flex:1;height:34px;border:1px solid var(--line);background:#fff;border-radius:9px;font-size:17px;line-height:1}
 #ctx .dirs button:hover{border-color:var(--accent);background:var(--accent-soft);color:#B8430C}
 
-#styleFab{display:none;position:absolute;left:8px;bottom:72px;z-index:12;height:44px;border-radius:14px}
+#styleFab,#aiFab{display:none;position:absolute;left:8px;bottom:72px;z-index:12;height:44px;border-radius:14px}
+#aiFab{left:104px}
+#aiBar{display:none;left:50%;transform:translateX(-50%);bottom:74px;width:min(700px,calc(100% - 150px));padding:12px 14px;z-index:14;flex-direction:column;gap:9px}
+#aiBar.open{display:flex}
+.aih{display:flex;align-items:center;gap:8px}
+.aibadge{display:inline-flex;align-items:center;gap:6px;font:600 14px Fraunces,Georgia,serif;color:#B8430C}
+.aibadge i{width:17px;height:17px;color:var(--accent)}
+.aictx{font-size:12px;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.aix{border:0;background:none;font-size:22px;line-height:1;color:var(--muted);width:30px;height:30px;border-radius:8px}
+.aix:hover{background:var(--accent-soft);color:#B8430C}
+.aiout{display:none;max-height:30vh;overflow:auto}
+.aiout.has{display:block}
+.aimsg{background:#FFF7EC;border:1px solid var(--line);border-radius:12px;padding:10px 13px;white-space:normal;line-height:1.5}
+.aimsg.err{background:#FDECE7;border-color:#F4C2B5;color:#8E2A10}
+.aiadded{margin-top:6px;font-size:12.5px;color:#3F7A4F}
+.ainote{margin-top:8px;height:30px;font-size:12.5px;padding:0 11px}
+.aidots{display:inline-flex;gap:4px;padding:4px 0}
+.aidots i{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:aib 1s infinite ease-in-out}
+.aidots i:nth-child(2){animation-delay:.15s}.aidots i:nth-child(3){animation-delay:.3s}
+@keyframes aib{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1.1)}}
+.aichips{display:flex;gap:6px;flex-wrap:wrap}
+.aichips button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-size:13px;font-weight:500}
+.aichips button:hover{border-color:var(--accent);color:#B8430C;background:var(--accent-soft)}
+.aiin{display:flex;gap:8px;align-items:flex-end}
+.aiin textarea{flex:1;resize:none;overflow:hidden;height:42px;min-height:42px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;line-height:1.4;max-height:120px;background:#fff;color:var(--ink)}
+.aiin textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.aiin .btn{height:42px;width:42px}
+#aiBar.busy .aiin .btn{opacity:.5;pointer-events:none}
 body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 
 #printArea{display:none}
@@ -229,7 +256,9 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   #zoom{right:8px;bottom:74px}
   #zoom button{height:40px;min-width:40px}
   #zoom .hm,#zoom .v{font-size:13px}
-  #styleFab{display:inline-flex}
+  #styleFab,#aiFab{display:inline-flex}
+  #aiBar{left:8px;right:8px;width:auto;transform:none;bottom:126px;max-height:58%;overflow:auto}
+  #tGrid,#tSnap,#zoom .vs{display:none}
   #props{display:none;left:8px;right:8px;top:auto;bottom:126px;width:auto;max-height:48%}
   #props.open{display:block}
   .s{width:32px;height:32px}
@@ -269,6 +298,7 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   </a>
   <div class="grow"></div>
 
+  <button class="btn primary hide-m" id="aiBtn" title="Asystent AI (Ctrl+J)"><i data-i="spark"></i><span class="lbl">AI</span></button>
   <div class="menu" id="mIns">
     <button class="btn" data-menu><i data-i="chart"></i><span class="lbl">Wstaw</span><i data-i="chev"></i></button>
     <div class="drop">
@@ -317,6 +347,7 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   <div class="menu only-m" id="mMore">
     <button class="btn ico" data-menu title="Więcej"><i data-i="more"></i></button>
     <div class="drop">
+      <button data-more="aiBtn"><b>Asystent AI</b><small>Powiedz, co ma zrobić na tablicy</small></button>
       <button data-more="cardsBtn"><b>Fiszki</b><small>Nauka z karteczek „pytanie :: odpowiedź”</small></button>
       <button data-more="palBtn"><b>Szukaj i polecenia</b></button>
       <button data-more="presentBtn"><b>Tryb prezentacji</b></button>
@@ -365,6 +396,22 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   </aside>
 
   <button class="btn primary" id="styleFab"><i data-i="sliders"></i>Styl</button>
+  <button class="btn primary" id="aiFab"><i data-i="spark"></i>AI</button>
+
+  <section id="aiBar" class="panel" aria-label="Asystent AI">
+    <div class="aih">
+      <span class="aibadge"><i data-i="spark"></i>Asystent AI</span>
+      <span class="aictx" id="aiCtx"></span>
+      <span class="grow"></span>
+      <button class="aix" id="aiClose" title="Zamknij" aria-label="Zamknij">×</button>
+    </div>
+    <div class="aiout" id="aiOut"></div>
+    <div class="aichips" id="aiChips"></div>
+    <div class="aiin">
+      <textarea id="aiText" rows="1" maxlength="1500" placeholder="Powiedz AI, co ma zrobić… np. „Zrób mapę myśli o fotosyntezie”"></textarea>
+      <button class="btn primary ico" id="aiSend" title="Wyślij (Enter)"><i data-i="send"></i></button>
+    </div>
+  </section>
   <div id="tabs" class="panel"></div>
 
   <div id="zoom" class="panel">
@@ -430,6 +477,7 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
     <tr><td>Przesuwanie widoku</td><td>kółko myszy lub gładzik</td></tr>
     <tr><td>Zoom</td><td><kbd class="k">Ctrl</kbd> + kółko myszy</td></tr>
     <tr><td>Szukaj / polecenia</td><td><kbd class="k">Ctrl</kbd>+<kbd class="k">K</kbd></td></tr>
+    <tr><td>Asystent AI</td><td><kbd class="k">Ctrl</kbd>+<kbd class="k">J</kbd> lub prawy przycisk → Zapytaj AI</td></tr>
     <tr><td>Dotyk: zoom i przesuwanie</td><td>dwa palce; jeden palec na pustym miejscu przesuwa widok</td></tr>
     <tr><td>Dotyk: edycja</td><td>dwukrotne stuknięcie (tekst, komórka tabeli, wykres)</td></tr>
     <tr><td>Dotyk: menu elementu</td><td>przytrzymaj palec</td></tr>
@@ -487,6 +535,8 @@ const ICONS={
   search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   al_l:'<path d="M4 3v18M8 6h12M8 14h7"/>',al_c:'<path d="M12 3v18M5 7h14M8 15h8"/>',al_r:'<path d="M20 3v18M4 6h12M9 14h7"/>',
   al_t:'<path d="M3 4h18M6 8v12M14 8v7"/>',al_m:'<path d="M3 12h18M7 5v14M15 8v8"/>',al_b:'<path d="M3 20h18M6 4v12M14 9v7"/>',
+  spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+  send:'<path d="M5 12l14-7-5 14-2.5-5.5z"/>',
   more:'<circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/>',
   al_dh:'<path d="M4 4v16M20 4v16M10 8h4v8h-4z"/>',al_dv:'<path d="M4 4h16M4 20h16M8 10v4h8v-4z"/>'
 };
@@ -506,7 +556,7 @@ const DEF={stroke:INK,fill:'none',sw:2.5,dash:'solid',font:'sans',size:20,op:1};
 const KEY='workdocs.v1';
 const coarse=()=>matchMedia('(pointer:coarse)').matches||innerWidth<700;
 const touches=new Map();
-let pinch=null,gesture=false,lpT=0,lp0=null,lpFired=false,lastTap=null,lastDbl=0;
+let pinch=null,gesture=false,lpT=0,lp0=null,lpFired=false,lastTap=null,lastDbl=0,aiOpenFlag=false;
 
 /* ---------- stan ---------- */
 const mkBoard=name=>({id:uid(),name,els:[],view:{x:260,y:150,z:1}});
@@ -861,6 +911,7 @@ function updateProps(){
   $('#aData').style.display=se.length===1&&(se[0].type==='chart'||se[0].type==='table')?'':'none';
   const s1=se.length===1?se[0]:null;
   $('#aEdit').style.display=s1&&!isLine(s1)&&!['pen','image','chart','table'].includes(s1.type)?'':'none';
+  if(aiOpenFlag)updateAICtx();
 }
 $('#aEdit').onclick=()=>{const e=selEls()[0];if(e){$('#props').classList.remove('open');startEdit(e.id);}};
 $('#segRoute').innerHTML=[['straight','Prosta'],['curve','Łuk'],['elbow','Łamana']].map(d=>`<button data-v="${d[0]}">${d[1]}</button>`).join('');
@@ -1238,7 +1289,7 @@ addEventListener('resize',()=>{commitEdit();applyView();});
 
 /* ---------- klawiatura ---------- */
 addEventListener('keydown',ev=>{
-  if(ev.target.closest&&ev.target.closest('[contenteditable]'))return;
+  if(ev.target.closest&&ev.target.closest('[contenteditable],textarea,input[type=text]'))return;
   if(document.querySelector('dialog[open]'))return;
   const mod=ev.ctrlKey||ev.metaKey,k=ev.key.toLowerCase();
   if(mod){
@@ -1247,6 +1298,7 @@ addEventListener('keydown',ev=>{
     else if(k==='d'){ev.preventDefault();duplicate();}
     else if(k==='a'){ev.preventDefault();setTool('select');sel=new Set(board().els.map(e=>e.id));renderSel();updateProps();}
     else if(k==='k'){ev.preventDefault();openPalette();}
+    else if(k==='j'){ev.preventDefault();openAI();}
     return;
   }
   if(k===' '){ev.preventDefault();if(!spaceDown){spaceDown=true;svg.classList.add('t-hand');}return;}
@@ -1542,6 +1594,7 @@ function paletteItems(){
   add('Nowa tablica','Tablica',()=>{state.boards.push(mkBoard('Tablica '+(state.boards.length+1)));switchBoard(state.boards.length-1);});
   add('Pobierz jako PNG','Plik',exportPNG);
   add('Drukuj / zapisz jako PDF','Plik',()=>$('#mFile [data-act=print]').click());
+  add('Zapytaj AI','Asystent',()=>openAI());
   add('Tryb fiszek','Nauka',startCards);add('Tryb prezentacji','Widok',()=>setPresent(true));add('Timer nauki — start / pauza','Nauka',pomoToggle);
   add('Pokaż / ukryj siatkę','Widok',()=>$('#tGrid').click());add('Przyciąganie do siatki','Widok',()=>$('#tSnap').click());
   board().els.forEach(e=>{const t=(e.text||e.title||'').replace(/\s+/g,' ').trim();if(t)add(t.slice(0,70),'Na tablicy',()=>jumpTo(e));});
@@ -1709,7 +1762,7 @@ ctx.addEventListener('click',ev=>{
 });
 ctx.addEventListener('contextmenu',e=>e.preventDefault());
 function elementMenu(e){
-  const items=[];
+  const items=[{l:'✨ Zapytaj AI…',k:'Ctrl+J',run:()=>openAI()},{l:'✨ AI: wyjaśnij',run:()=>openAI(AI_PRESETS.explain,true)},{l:'✨ AI: rozbuduj',run:()=>openAI(AI_PRESETS.expand,true)},{l:'✨ AI: zrób fiszki',run:()=>openAI(AI_PRESETS.cards,true)},'-'];
   if(sel.size<2){
     if(e.type==='chart'||e.type==='table')items.push({l:'Edytuj dane…',run:()=>openData(e.id)});
     else if(!isLine(e)&&e.type!=='pen'&&e.type!=='image')items.push({l:'Edytuj tekst',k:'dwuklik',run:()=>startEdit(e.id)});
@@ -1726,12 +1779,297 @@ function pasteInternal(){
 }
 function canvasMenu(p){
   const items=[
+    {l:'✨ Zapytaj AI…',k:'Ctrl+J',run:()=>openAI()},'-',
     {l:'Dodaj tekst tutaj',run:()=>{const e=mkUser('text',{x:r1(p.x),y:r1(p.y-12),text:'',fill:'none'});board().els.push(e);startEdit(e.id);}},
     {l:'Dodaj karteczkę tutaj',run:()=>{const e=newNote(p);board().els.push(e);startEdit(e.id);}}
   ];
   if(clip.length)items.push({l:'Wklej',k:'Ctrl+V',run:pasteInternal});
   items.push('-',{l:'Zaznacz wszystko',k:'Ctrl+A',run:()=>{setTool('select');sel=new Set(board().els.map(x=>x.id));renderSel();updateProps();}},{l:'Dopasuj widok',run:fit});
   return items;
+}
+
+/* ---------- asystent AI ---------- */
+const AI_PRESETS={
+  explain:'Wyjaśnij prostym językiem zaznaczone elementy. Odpowiedz w message i wstaw krótkie wyjaśnienie jako jedną karteczkę (note).',
+  expand:'Rozbuduj zaznaczone elementy o logiczne gałęzie i szczegóły: dodaj nowe węzły połączone krawędziami (from = id zaznaczonego elementu) z istniejącymi.',
+  cards:'Na podstawie zaznaczonych treści utwórz fiszki: karteczki (shape note) z tekstem w formacie „pytanie :: odpowiedź”, layout grid.',
+  sum:'Podsumuj zaznaczone treści w 3–5 punktach i wstaw jako jedną karteczkę (note).',
+  en:'Przetłumacz teksty zaznaczonych elementów na angielski, używając pola edit (zachowaj id).'
+};
+const AI_COLORS={orange:['#FFE2CC',ORG],blue:['#D6E6FF','#3A6FD8'],green:['#D9F0DD','#3F9B5F'],purple:['#EBDDFB','#8B5CC9'],yellow:['#FFF0B8','#C98A0B'],red:['#FBD9D5','#D93B2B'],gray:['#EFE7DC','#8A7A6B']};
+const LEVEL_COLORS=['orange','blue','green','purple','yellow','red'];
+const aiEl=$('#aiBar');
+let aiBusy=false,aiLastMsg='';
+
+function aiContext(){
+  const s=selEls(),brief=e=>{
+    const o={id:e.id,type:e.type,text:String(e.text||e.title||'').slice(0,400)};
+    if(e.type==='chart'){o.kind=e.kind;o.cats=e.cats;o.series=e.series;}
+    if(e.type==='table')o.rows=e.rows.slice(0,20);
+    return o;
+  };
+  const list=s.length?s.slice(0,40):board().els.filter(e=>e.text||e.title||e.type==='chart'||e.type==='table').slice(0,80);
+  const ids=new Set(list.map(e=>e.id));
+  return{
+    scope:s.length?'selection':'board',
+    [s.length?'selection':'board']:list.map(brief),
+    links:board().els.filter(e=>isLine(e)&&e.a&&e.b&&ids.has(e.a)&&ids.has(e.b)).slice(0,100).map(e=>({from:e.a,to:e.b})),
+    totalElements:board().els.length
+  };
+}
+function updateAICtx(){
+  $('#aiCtx').textContent=sel.size?`Zaznaczone: ${sel.size}`:'Cała tablica';
+  const chips=sel.size
+    ?[['Wyjaśnij',AI_PRESETS.explain],['Rozbuduj',AI_PRESETS.expand],['Zrób fiszki',AI_PRESETS.cards],['Podsumuj',AI_PRESETS.sum],['Po angielsku',AI_PRESETS.en]]
+    :[['Mapa myśli','Zrób mapę myśli na temat: ',1],['Schemat blokowy','Zrób schemat blokowy procesu: ',1],['Oś czasu','Zrób oś czasu (karteczki w układzie grid): ',1],['Wykres','Zrób wykres: ',1],['Plan nauki','Zrób plan nauki w tabeli na: ',1],['Fiszki','Zrób zestaw fiszek (karteczki „pytanie :: odpowiedź”) o: ',1]];
+  $('#aiChips').innerHTML=chips.map((c,i)=>`<button data-c="${i}">${c[0]}</button>`).join('');
+  $('#aiChips')._chips=chips;
+}
+function openAI(prefill,autoSend){
+  commitEdit();aiOpenFlag=true;aiEl.classList.add('open');updateAICtx();
+  if(prefill!=null)$('#aiText').value=prefill;
+  if(autoSend)aiSend();else setTimeout(()=>{try{$('#aiText').focus({preventScroll:true});}catch(e){}},30);
+}
+function closeAI(){aiOpenFlag=false;aiEl.classList.remove('open');}
+function aiShow(html,cls){const o=$('#aiOut');o.innerHTML=html;o.classList.add('has');o.scrollTop=0;if(cls)o.firstElementChild&&o.firstElementChild.classList.add(cls);}
+function aiMsgHTML(msg,added){
+  const t=esc(msg||'').replace(/\n/g,'<br>');
+  return`<div class="aimsg">${t}${added?`<div class="aiadded">✓ Dodano lub zmieniono ${added} el. na tablicy — Ctrl+Z cofa całość</div>`:''}</div>`+
+    (!added&&msg?'<button class="btn ainote" id="aiNote">Wstaw odpowiedź na tablicę</button>':'');
+}
+async function aiCall(prompt,context,retried){
+  const code=(()=>{try{return localStorage.getItem('workdocs.code')||'';}catch(e){return'';}})();
+  let r;
+  try{r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json','x-access-code':code},body:JSON.stringify({prompt,context})});}
+  catch(e){throw new Error('Brak połączenia z serwerem AI. Funkcja działa po wdrożeniu na Vercel (lub lokalnie przez dev-server.js).');}
+  if(r.status===401&&!retried){
+    const c=window.prompt('Podaj kod dostępu do AI:');
+    if(c){try{localStorage.setItem('workdocs.code',c);}catch(e){}return aiCall(prompt,context,true);}
+    throw new Error('Potrzebny jest kod dostępu.');
+  }
+  if(r.status===404||r.status===405||r.status===501)throw new Error('Nie znaleziono backendu AI (/api/ai). Wdróż projekt razem z folderem api na Vercelu.');
+  let j=null;try{j=await r.json();}catch(e){}
+  if(!r.ok)throw new Error((j&&j.error)||`Błąd serwera (${r.status})`);
+  if(!j||typeof j!=='object')throw new Error('Niepoprawna odpowiedź serwera.');
+  return j;
+}
+async function aiSend(){
+  if(aiBusy)return;
+  const prompt=$('#aiText').value.trim();if(!prompt)return;
+  if(location.protocol==='file:'){aiShow('<div class="aimsg err">AI działa po wdrożeniu na Vercel (albo lokalnie przez <b>node dev-server.js</b>). Otwarcie samego pliku index.html nie wystarczy, bo klucz API musi być na serwerze.</div>');return;}
+  aiBusy=true;aiEl.classList.add('busy');
+  aiShow('<div class="aimsg"><span class="aidots"><i></i><i></i><i></i></span> AI pracuje…</div>');
+  try{
+    const res=await aiCall(prompt,aiContext());
+    const n=applyAI(res);aiLastMsg=String(res.message||'');
+    aiShow(aiMsgHTML(aiLastMsg,n));$('#aiText').value='';autoGrow();
+  }catch(e){aiShow(`<div class="aimsg err">${esc(e.message)}</div>`);}
+  finally{aiBusy=false;aiEl.classList.remove('busy');}
+}
+function autoGrow(){const t=$('#aiText');t.style.height='auto';t.style.height=Math.max(42,Math.min(120,t.scrollHeight))+'px';t.style.overflowY=t.scrollHeight>120?'auto':'hidden';}
+$('#aiText').addEventListener('input',autoGrow);
+$('#aiText').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();aiSend();}if(e.key==='Escape')closeAI();});
+$('#aiSend').onclick=aiSend;
+$('#aiClose').onclick=closeAI;
+$('#aiBtn').onclick=()=>aiOpenFlag?closeAI():openAI();
+$('#aiFab').onclick=()=>aiOpenFlag?closeAI():openAI();
+$('#aiChips').addEventListener('click',e=>{
+  const b=e.target.closest('[data-c]');if(!b)return;
+  const c=$('#aiChips')._chips[+b.dataset.c];
+  $('#aiText').value=c[1];autoGrow();
+  if(c[2]){$('#aiText').focus();const t=$('#aiText');t.setSelectionRange(t.value.length,t.value.length);}else aiSend();
+});
+$('#aiOut').addEventListener('click',e=>{
+  if(e.target.id==='aiNote'&&aiLastMsg){const c=viewCenter(),n=newNote(c);n.text=aiLastMsg.slice(0,800);n.size=24;n.w=300;n.h=220;n.x=r1(c.x-150);n.y=r1(c.y-110);place(n);}
+});
+
+/* --- układ elementów --- */
+function aiSizeNode(n){
+  const shape=['rect','ellipse','diamond','note'].includes(n.shape)?n.shape:'rect',note=shape==='note';
+  const size=note?26:20,font=note?'hand':'sans',lh=size*1.25,lines=wrap(n.text,note?200:190,size,font);
+  const lw=Math.max(20,...lines.map(l=>measure(l,size,font)));let w,h;
+  if(note){w=lw+44;h=lines.length*lh+44;}
+  else if(shape==='ellipse'){w=lw/.72+14;h=(lines.length*lh+22)/.7;}
+  else if(shape==='diamond'){w=lw/.55+14;h=(lines.length*lh+22)/.55;}
+  else{w=lw+32;h=lines.length*lh+28;}
+  Object.assign(n,{shape,size,font,w:Math.round(Math.max(note?160:110,w)),h:Math.round(Math.max(note?110:54,h))});
+}
+function layoutForest(items,kids,roots,dir){
+  const down=dir!=='right',gM=down?36:26,gN=down?80:110,by={};items.forEach(n=>by[n.id]=n);
+  const maj=n=>down?n.w:n.h,mino=n=>down?n.h:n.w,sub={},ch={},lvl={},lmax=[],seen=new Set();
+  const m=(id,d)=>{
+    seen.add(id);lvl[id]=d;const n=by[id];lmax[d]=Math.max(lmax[d]||0,mino(n));ch[id]=[];let tot=0;
+    for(const k of kids[id]||[]){if(seen.has(k)||!by[k])continue;ch[id].push(k);tot+=m(k,d+1)+gM;}
+    tot=ch[id].length?tot-gM:0;sub[id]=Math.max(maj(n),tot);return sub[id];
+  };
+  const rs=[...roots];items.forEach(n=>{if(!rs.includes(n.id))rs.push(n.id);});
+  for(const r of rs)if(!seen.has(r)&&by[r])m(r,0);
+  const off=[];let acc=0;lmax.forEach((v,i)=>{off[i]=acc;acc+=v+gN;});
+  const pos={},placed=new Set();
+  const place=(id,start)=>{
+    placed.add(id);const n=by[id],c=start+sub[id]/2,mj=c-maj(n)/2;
+    pos[id]=down?{x:mj,y:off[lvl[id]]}:{x:off[lvl[id]],y:mj};
+    const tot=ch[id].reduce((a,k)=>a+sub[k]+gM,0)-(ch[id].length?gM:0);
+    let s=start+(sub[id]-tot)/2;for(const k of ch[id]){place(k,s);s+=sub[k]+gM;}
+  };
+  let cur=0;
+  for(const r of rs)if(by[r]&&!placed.has(r)){place(r,cur);cur+=sub[r]+gM*2;}
+  return{pos,lvl};
+}
+function layoutLayered(items,edges,dir){
+  const down=dir!=='right',gM=down?40:28,gN=down?85:120,by={},par={};items.forEach(n=>{by[n.id]=n;par[n.id]=[];});
+  const kidsOf={};items.forEach(n=>kidsOf[n.id]=[]);
+  edges.forEach(e=>{if(by[e.from]&&by[e.to])kidsOf[e.from].push(e.to);});
+  const stt={},back=new Set(),dfs=u=>{stt[u]=1;for(const v of kidsOf[u]){if(stt[v]===1)back.add(u+'>'+v);else if(!stt[v])dfs(v);}stt[u]=2;};
+  const hasPar=new Set(edges.filter(e=>by[e.from]&&by[e.to]).map(e=>e.to));
+  items.filter(n=>!hasPar.has(n.id)).forEach(n=>{if(!stt[n.id])dfs(n.id);});
+  items.forEach(n=>{if(!stt[n.id])dfs(n.id);});
+  edges.forEach(e=>{if(by[e.from]&&by[e.to]&&!back.has(e.from+'>'+e.to))par[e.to].push(e.from);});
+  const level={},lv=id=>{if(level[id]!=null)return level[id];let m=0;for(const p of par[id])m=Math.max(m,lv(p)+1);level[id]=m;return m;};
+  items.forEach(n=>lv(n.id));
+  const rows=[];items.forEach(n=>{(rows[level[n.id]]=rows[level[n.id]]||[]).push(n);});
+  const idx={},maj=n=>down?n.w:n.h,mino=n=>down?n.h:n.w,pos={};let off=0;
+  rows.forEach((row,ri)=>{
+    if(!row)return;
+    if(ri>0)row.sort((a,b)=>{const f=n=>{const p=par[n.id].filter(x=>idx[x]!=null);return p.length?p.reduce((s,x)=>s+idx[x],0)/p.length:1e9;};return f(a)-f(b);});
+    const tot=row.reduce((a,n)=>a+maj(n)+gM,0)-gM,lm=Math.max(...row.map(mino));let cur=-tot/2;
+    row.forEach(n=>{const c=cur+maj(n)/2;idx[n.id]=c;pos[n.id]=down?{x:cur,y:off}:{x:off,y:cur};cur+=maj(n)+gM;});
+    off+=lm+gN;
+  });
+  return pos;
+}
+function layoutMind(items,edges){
+  const by={};items.forEach(n=>by[n.id]=n);
+  const out={};items.forEach(n=>out[n.id]=0);edges.forEach(e=>{if(out[e.from]!=null)out[e.from]++;});
+  const root=items.slice().sort((a,b)=>out[b.id]-out[a.id])[0],adj={};
+  items.forEach(n=>adj[n.id]=[]);edges.forEach(e=>{if(adj[e.from]&&adj[e.to]){adj[e.from].push(e.to);adj[e.to].push(e.from);}});
+  const kids={},vis=new Set([root.id]),q=[root.id],depth={[root.id]:0};
+  while(q.length){const u=q.shift();kids[u]=[];for(const k of adj[u]){if(vis.has(k))continue;vis.add(k);kids[u].push(k);depth[k]=depth[u]+1;q.push(k);}}
+  items.forEach(n=>{if(!vis.has(n.id)){vis.add(n.id);kids[root.id].push(n.id);kids[n.id]=[];depth[n.id]=1;}});
+  const rk=kids[root.id].filter((_,i)=>i%2===0),lk=kids[root.id].filter((_,i)=>i%2===1);
+  const desc=k=>[k,...(kids[k]||[]).flatMap(desc)],rAll=rk.flatMap(desc),lAll=lk.flatMap(desc);
+  const R=layoutForest([root,...rAll.map(id=>by[id])],{...kids,[root.id]:rk},[root.id],'right');
+  const L=layoutForest([root,...lAll.map(id=>by[id])],{...kids,[root.id]:lk},[root.id],'right');
+  const pos={},cyR=R.pos[root.id].y+root.h/2,cyL=L.pos[root.id].y+root.h/2;
+  pos[root.id]={x:0,y:-root.h/2};
+  rAll.forEach(id=>{if(R.pos[id])pos[id]={x:R.pos[id].x,y:R.pos[id].y-cyR};});
+  lAll.forEach(id=>{if(L.pos[id]){const n=by[id];pos[id]={x:root.w-L.pos[id].x-n.w,y:L.pos[id].y-cyL};}});
+  return{pos,depth};
+}
+function layoutGrid(items){
+  const cols=Math.max(1,Math.ceil(Math.sqrt(items.length))),cw=Math.max(...items.map(n=>n.w))+34,pos={};let y=0;
+  for(let i=0;i<items.length;i+=cols){const row=items.slice(i,i+cols),rh=Math.max(...row.map(n=>n.h))+34;row.forEach((n,j)=>pos[n.id]={x:j*cw,y});y+=rh;}
+  return pos;
+}
+function focusOn(b){
+  const v=view(),pad=70,fz=Math.min((W()-pad*2)/Math.max(b.w,1),(Hh()-pad*2-110)/Math.max(b.h,1));
+  v.z=clamp(Math.min(v.z,fz),.15,4);v.x=W()/2-(b.x+b.w/2)*v.z;v.y=(Hh()-60)/2-(b.y+b.h/2)*v.z;applyView();
+}
+
+/* --- wykonanie odpowiedzi AI --- */
+function applyAI(r){
+  commitEdit();
+  const B=board(),exist=new Map(B.els.map(e=>[e.id,e])),isExBox=id=>{const e=exist.get(id);return!!e&&isBox(e);};
+  const layout=['mindmap','tree','flow','grid'].includes(r.layout)?r.layout:'tree',dir=r.direction==='right'?'right':'down';
+  const byId={},nodes=[];
+  for(const n of (Array.isArray(r.nodes)?r.nodes:[]).slice(0,60)){
+    if(!n||typeof n.id!=='string'||typeof n.text!=='string'||byId[n.id]||exist.has(n.id))continue;
+    const o={id:n.id.slice(0,30),text:n.text.slice(0,300),shape:n.shape,color:n.color};byId[o.id]=o;nodes.push(o);
+  }
+  nodes.forEach(aiSizeNode);
+  const edges=(Array.isArray(r.edges)?r.edges:[]).slice(0,120).filter(e=>e&&typeof e.from==='string'&&typeof e.to==='string'&&e.from!==e.to&&(byId[e.from]||isExBox(e.from))&&(byId[e.to]||isExBox(e.to)));
+  const added=[],newEls=[],pos={};
+  const colorOf=(n,depth)=>{
+    const key=AI_COLORS[n.color]?n.color:(layout==='tree'||layout==='mindmap')&&n.shape!=='note'&&depth!=null?LEVEL_COLORS[depth%LEVEL_COLORS.length]:null;
+    if(key)return AI_COLORS[key];
+    return n.shape==='note'?[CREAM,ORG]:['#FFFFFF',INK];
+  };
+  // 1) węzły podpięte do istniejących elementów
+  const kidsNew={};edges.forEach(e=>{(kidsNew[e.from]=kidsNew[e.from]||[]).push(e.to);});
+  const attached=new Set(),depthOf={},occupied=B.els.filter(isBox).map(bbox);
+  const anchors=[...new Set(edges.filter(e=>isExBox(e.from)&&byId[e.to]).map(e=>e.from))];
+  for(const a of anchors){
+    const ab=bbox(exist.get(a)),items=[{id:a,w:ab.w,h:ab.h}],kids={},q=[a],vis=new Set([a]);depthOf[a]=0;
+    while(q.length){const u=q.shift();for(const k of kidsNew[u]||[]){if(!byId[k]||vis.has(k)||attached.has(k))continue;vis.add(k);attached.add(k);(kids[u]=kids[u]||[]).push(k);items.push(byId[k]);depthOf[k]=depthOf[u]+1;q.push(k);}}
+    if(items.length<2)continue;
+    const L=layoutForest(items,kids,[a],'right'),dx=ab.x-L.pos[a].x,dy0=ab.y-L.pos[a].y;
+    const blk=union(items.filter(n=>n.id!==a).map(n=>({x:L.pos[n.id].x+dx,y:L.pos[n.id].y+dy0,w:n.w,h:n.h})));
+    let dy=dy0;
+    for(let i=0;i<30;i++){
+      const off=i?(i%2?1:-1)*Math.ceil(i/2)*80:0,test={x:blk.x-8,y:blk.y+off-8,w:blk.w+16,h:blk.h+16};
+      if(!occupied.some(o=>overlap(test,o))){dy=dy0+off;break;}
+    }
+    items.forEach(n=>{if(n.id!==a){pos[n.id]={x:L.pos[n.id].x+dx,y:L.pos[n.id].y+dy};}});
+    occupied.push({x:blk.x,y:blk.y+(dy-dy0),w:blk.w,h:blk.h});
+  }
+  // 2) wolne węzły wg wybranego układu
+  const free=nodes.filter(n=>!attached.has(n.id)),fe=edges.filter(e=>byId[e.from]&&byId[e.to]&&!attached.has(e.from)&&!attached.has(e.to));
+  let rel={};
+  if(free.length){
+    if(layout==='grid')rel=layoutGrid(free);
+    else if(layout==='mindmap'){const L=layoutMind(free,fe);rel=L.pos;Object.assign(depthOf,L.depth);}
+    else{
+      const par={};fe.forEach(e=>par[e.to]=(par[e.to]||0)+1);
+      const forest=layout==='tree'&&Object.values(par).every(c=>c<=1);
+      if(forest){
+        const kids={};fe.forEach(e=>(kids[e.from]=kids[e.from]||[]).push(e.to));
+        const roots=free.filter(n=>!par[n.id]).map(n=>n.id),L=layoutForest(free,kids,roots,dir);rel=L.pos;Object.assign(depthOf,L.lvl);
+      }else rel=layoutLayered(free,fe,dir);
+    }
+  }
+  const freeEls=[];
+  for(const n of free){
+    const p=rel[n.id]||{x:0,y:0},[fill,stroke]=colorOf(n,depthOf[n.id]);
+    const el=clean({type:n.shape,x:p.x,y:p.y,w:n.w,h:n.h,text:n.text,fill,stroke,font:n.font,size:n.size,sw:2.5});
+    if(el){el.id=n.id;freeEls.push(el);}
+  }
+  // 3) wykresy, tabele, teksty — rząd pod blokiem
+  const extra=[];
+  for(const c of (Array.isArray(r.charts)?r.charts:[]).slice(0,3)){const e=clean({type:'chart',kind:c.kind,title:c.title,cats:c.cats,series:c.series,x:0,y:0,w:500,h:320});if(e)extra.push(e);}
+  for(const t of (Array.isArray(r.tables)?r.tables:[]).slice(0,3)){
+    const rows=(Array.isArray(t.rows)?t.rows:[]).slice(0,12),C=Math.max(1,...rows.map(x=>Array.isArray(x)?x.length:0));
+    const e=clean({type:'table',rows,header:t.header!==false,x:0,y:0,w:Math.min(760,C*170),h:rows.length*46});if(e)extra.push(e);
+  }
+  const SZ={s:16,m:20,l:28,xl:40};
+  for(const t of (Array.isArray(r.texts)?r.texts:[]).slice(0,6)){if(t&&typeof t.text==='string'){const e=clean({type:'text',x:0,y:0,text:t.text,size:SZ[t.size]||20});if(e)extra.push(e);}}
+  let blockB=freeEls.length?union(freeEls.map(bbox)):null,cx=blockB?blockB.x:0;const ey=blockB?blockB.y+blockB.h+60:0;
+  extra.forEach(e=>{const b=bbox(e);moveEl(e,{x:e.x,y:e.y},cx-b.x,ey-b.y);cx+=b.w+40;});
+  const all=[...freeEls,...extra];
+  if(all.length){
+    const u=union(all.map(bbox)),sb=sel.size?union(selEls().map(bbox)):null,c=viewCenter();
+    const dx=sb?sb.x+sb.w+120-u.x:c.x-(u.x+u.w/2),dy=sb?sb.y-u.y:c.y-(u.y+u.h/2);
+    all.forEach(e=>moveEl(e,JSON.parse(JSON.stringify(e)),Math.round(dx),Math.round(dy)));
+    freeEls.forEach(n=>{pos[n.id]={x:n.x,y:n.y};});
+  }
+  // pozycje końcowe nowych węzłów (dla etykiet) i elementy
+  for(const n of nodes){if(attached.has(n.id)){const p=pos[n.id],[fill,stroke]=colorOf(n,depthOf[n.id]);const el=clean({type:n.shape,x:p.x,y:p.y,w:n.w,h:n.h,text:n.text,fill,stroke,font:n.font,size:n.size,sw:2.5});if(el){el.id=n.id;newEls.push(el);}}}
+  newEls.push(...all);
+  // 4) połączenia
+  const ids=new Set(newEls.map(e=>e.id)),links=[],labels=[];
+  const cOf=id=>{const e=exist.get(id)||newEls.find(x=>x.id===id);return e?ctr(bbox(e)&&{x:e.x,y:e.y,w:e.w,h:e.h}):[0,0];};
+  for(const e of edges){
+    if(!(ids.has(e.from)||isExBox(e.from))||!(ids.has(e.to)||isExBox(e.to)))continue;
+    const att=attached.has(e.to),flow=layout==='flow'&&!att;
+    const ln=mk(flow?'arrow':'line',{a:e.from,b:e.to,route:att||layout==='mindmap'?'curve':'elbow',stroke:flow?INK:'#8A7A6B',sw:2.2,x1:0,y1:0,x2:0,y2:0});
+    links.push(ln);
+    if(typeof e.label==='string'&&e.label.trim()){const a=cOf(e.from),b=cOf(e.to);labels.push(mk('text',{x:r1((a[0]+b[0])/2+8),y:r1((a[1]+b[1])/2-12),text:e.label.slice(0,30),size:16,stroke:'#8A7A6B'}));}
+  }
+  // 5) edycje i usuwanie
+  let changed=0;
+  for(const ed_ of (Array.isArray(r.edit)?r.edit:[]).slice(0,60)){
+    const e=ed_&&exist.get(ed_.id);
+    if(e&&['rect','ellipse','diamond','note','text'].includes(e.type)&&typeof ed_.text==='string'){e.text=ed_.text.slice(0,5000);changed++;}
+  }
+  const del=new Set((Array.isArray(r.delete)?r.delete:[]).slice(0,50).filter(id=>typeof id==='string'&&exist.has(id)));
+  if(del.size){B.els=B.els.filter(e=>!del.has(e.id));changed+=del.size;}
+  B.els.push(...links,...newEls,...labels);
+  const total=newEls.length+links.length+labels.length+changed;
+  if(!total)return 0;
+  sel=new Set(newEls.map(e=>e.id));
+  if(!sel.size)pruneSel();
+  setTool('select');render();commit();
+  if(newEls.length)focusOn(union(newEls.map(bbox)));
+  return total;
 }
 
 /* ---------- start ---------- */
