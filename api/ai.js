@@ -166,7 +166,9 @@ module.exports = async function handler(req, res) {
     });
     if (!r.ok) {
       const map = { 401: 'Serwer ma nieprawidłowy klucz API.', 429: 'Limit zapytań do AI — spróbuj za chwilę.', 529: 'AI jest przeciążone — spróbuj za chwilę.' };
-      return send(res, 502, { error: map[r.status] || `Błąd usługi AI (${r.status}).` });
+      let detail = '';
+      try { const j = await r.json(); detail = String((j && j.error && j.error.message) || '').slice(0, 220); } catch { /* ignore */ }
+      return send(res, 502, { error: map[r.status] || `Błąd usługi AI (${r.status})${detail ? ': ' + detail : ''}` });
     }
     const data = await r.json();
     const tool = (data.content || []).find(b => b.type === 'tool_use');
