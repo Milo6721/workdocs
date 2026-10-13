@@ -215,6 +215,33 @@ body.present #exitPresent{display:inline-flex}
 .aiin .btn{height:42px;width:42px}
 #aiBar.busy .aiin .btn{opacity:.5;pointer-events:none}
 body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--grad);color:#fff;display:inline-grid;place-items:center;font:600 13px Inter,sans-serif}
+.authmsg{min-height:20px;font-size:13px;color:#C23B14;margin:2px 0 4px}
+.authmsg.ok{color:#3F7A4F}
+.whoami{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.clist{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:42vh;overflow:auto}
+.ci2{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.ci2 b{display:block}
+.ci2 small{color:var(--muted)}
+.ci2 .ca{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+.ci2 .ca .btn{height:32px;font-size:12.5px;padding:0 10px}
+.ci2 select{border:1px solid var(--line);border-radius:8px;padding:5px 6px;font:inherit;font-size:12.5px;background:#fff}
+.badge2{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--accent-soft);color:#B8430C;margin-left:6px}
+.shadd{display:grid;grid-template-columns:1fr 150px auto;gap:8px;align-items:start}
+.shadd .dfield{margin:0}
+#peers{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;gap:-6px;z-index:9;pointer-events:none}
+#peers .pc{width:30px;height:30px;border-radius:50%;border:2px solid #fff;color:#fff;display:grid;place-items:center;font:600 12px Inter,sans-serif;margin-left:-6px;box-shadow:0 2px 6px rgba(0,0,0,.18);pointer-events:auto}
+#cursors{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:8}
+.rcur{position:absolute;left:0;top:0;transition:transform .08s linear;will-change:transform}
+.rcur svg{width:18px;height:18px;display:block}
+.rcur span{position:absolute;left:14px;top:14px;font:600 11px Inter,sans-serif;color:#fff;padding:2px 7px;border-radius:99px;white-space:nowrap}
+#roPill{display:none;position:absolute;top:12px;left:14px;z-index:9;background:var(--ink);color:#fff;font:600 12px Inter,sans-serif;padding:6px 12px;border-radius:99px}
+body.ro #roPill{display:block}
+body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,body.ro #mIns,body.ro #mTpl,body.ro #aiBtn,body.ro #undo,body.ro #redo{display:none!important}
+.sync{margin-left:6px;font-size:11.5px;color:var(--muted);white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding-right:6px}
+.sync i.dot{width:8px;height:8px;border-radius:50%;background:#3F9B5F;display:inline-block}
+.sync.saving i.dot{background:var(--accent);animation:aib 1s infinite ease-in-out}
+.sync.error i.dot,.sync.offline i.dot{background:#D93B2B}
 .drop{max-height:calc(100vh - 90px);overflow:auto}
 .polys{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:2px 6px 6px}
 .drop .polys button{flex-direction:column;align-items:center;justify-content:flex-start;padding:6px 2px;gap:3px;font-size:10px;line-height:1.1;text-align:center;width:auto}
@@ -294,6 +321,11 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   #styleFab,#aiFab{display:inline-flex}
   #aiBar{left:8px;right:8px;width:auto;transform:none;bottom:126px;max-height:58%;overflow:auto}
   #calc{left:8px;right:8px;width:auto;bottom:72px;max-height:80%;overflow:auto}
+  #peers{left:auto;right:8px;transform:none;top:10px}
+  #roPill{top:auto;bottom:130px}
+  .shadd{grid-template-columns:1fr}
+  .ci2{flex-direction:column;align-items:stretch}
+  .ci2 .ca{justify-content:flex-start}
   .keys button{height:44px}
   .frange{grid-template-columns:repeat(2,1fr)}
   #tGrid,#tSnap,#zoom .vs{display:none}
@@ -373,6 +405,7 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   <button class="btn ico hide-m" id="presentBtn" title="Tryb prezentacji"><i data-i="play"></i></button>
   <button class="btn ico hide-m" id="palBtn" title="Szukaj i polecenia (Ctrl+K)"><i data-i="search"></i></button>
   <button class="btn ico hide-m" id="calcBtn" title="Kalkulator (C)"><i data-i="calc"></i></button>
+  <button class="btn ico hide-m" id="accBtn" title="Konto i chmura"><i data-i="user"></i></button>
   <span class="sep"></span>
   <button class="btn ico" id="undo" title="Cofnij (Ctrl+Z)"><i data-i="undo"></i></button>
   <button class="btn ico" id="redo" title="Ponów (Ctrl+Y)"><i data-i="redo"></i></button>
@@ -380,6 +413,8 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   <div class="menu" id="mFile">
     <button class="btn primary" data-menu><i data-i="dl"></i><span class="lbl">Plik</span><i data-i="chev"></i></button>
     <div class="drop">
+      <button data-act="share"><b>Udostępnij tablicę…</b><small>Wpisz e-mail — widzą zmiany na żywo</small></button>
+      <hr>
       <button data-act="png"><b>Pobierz jako PNG</b><small>Obraz w wysokiej rozdzielczości</small></button>
       <button data-act="svg"><b>Pobierz jako SVG</b><small>Grafika wektorowa do edycji</small></button>
       <button data-act="print"><b>Drukuj / zapisz jako PDF</b><small>Cała tablica dopasowana do strony A4</small></button>
@@ -395,6 +430,7 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
     <button class="btn ico" data-menu title="Więcej"><i data-i="more"></i></button>
     <div class="drop">
       <button data-more="aiBtn"><b>Asystent AI</b><small>Powiedz, co ma zrobić na tablicy</small></button>
+      <button data-more="accBtn"><b>Konto i chmura</b><small>Logowanie, Twoje tablice, udostępnianie</small></button>
       <button data-more="calcBtn"><b>Kalkulator</b><small>Naukowy: trygonometria, logarytmy, potęgi</small></button>
       <button data-more="cardsBtn"><b>Fiszki</b><small>Nauka z karteczek „pytanie :: odpowiedź”</small></button>
       <button data-more="palBtn"><b>Szukaj i polecenia</b></button>
@@ -486,6 +522,9 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
     <button id="tSnap" title="Przyciągaj do siatki"><i data-i="magnet"></i><span class="hm">Przyciąganie</span></button>
   </div>
 
+  <div id="peers"></div>
+  <div id="cursors"></div>
+  <div id="roPill">Tylko podgląd</div>
   <div id="toast"></div>
 </main>
 
@@ -510,6 +549,40 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   </div>
   <p class="hint" id="dHint">Pierwsza kolumna to etykiety, kolejne to serie danych. Możesz wkleić dane z Excela lub Arkuszy (Ctrl+V w komórce).</p>
   <div class="row"><button class="btn" id="dCancel" style="margin-right:8px">Anuluj</button><button class="btn primary" id="dOk">Zapisz</button></div>
+</dialog>
+
+<dialog id="cloudDlg">
+  <h3 id="cloudTitle">Konto i chmura</h3>
+  <div id="authView">
+    <div class="kinds" id="authTabs"><button data-m="login" class="on">Logowanie</button><button data-m="reg">Rejestracja</button></div>
+    <input id="aEmail" class="dfield" type="text" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="E-mail (to Twój login)">
+    <input id="aPass" class="dfield" type="password" autocomplete="current-password" placeholder="Hasło (min. 6 znaków)">
+    <input id="aCode" class="dfield" type="text" autocomplete="off" placeholder="Kod rejestracji" style="display:none">
+    <div id="authMsg" class="authmsg"></div>
+    <div class="row" style="margin-top:6px"><button class="btn primary" id="authGo">Zaloguj się</button></div>
+    <p class="hint">E-maila nie trzeba potwierdzać. Po zalogowaniu Twoje tablice zapisują się w chmurze i możesz je udostępniać innym.</p>
+  </div>
+  <div id="listView" style="display:none">
+    <div class="whoami"><span>Zalogowano jako <b id="whoEmail"></b></span><button class="btn" id="logoutBtn">Wyloguj</button></div>
+    <div class="dtools" style="margin-top:12px"><button class="btn primary" id="cNew">+ Nowa tablica w chmurze</button><button class="btn" id="cUpload">Wyślij bieżącą tablicę do chmury</button></div>
+    <div class="clist" id="cList"></div>
+  </div>
+  <div class="row" style="margin-top:14px"><button class="btn" id="cloudClose">Zamknij</button></div>
+</dialog>
+
+<dialog id="shareDlg">
+  <h3>Udostępnij tablicę</h3>
+  <p class="hint" id="shName" style="margin:0 0 10px"></p>
+  <div class="shadd">
+    <input id="shEmail" class="dfield" type="text" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="E-mail osoby, której udostępniasz">
+    <select id="shRole" class="dfield"><option value="edit">Może edytować</option><option value="view">Tylko podgląd</option></select>
+    <button class="btn primary" id="shAdd">Udostępnij</button>
+  </div>
+  <div id="shMsg" class="authmsg"></div>
+  <div class="clist" id="shList"></div>
+  <div class="dtools"><button class="btn" id="shLink">Kopiuj link do tablicy</button></div>
+  <p class="hint">Osoba zobaczy tablicę po zalogowaniu na ten e-mail (także jeśli dopiero założy konto). Wyślij jej link — nie wysyłamy zaproszeń mailem. Zmiany widać na żywo.</p>
+  <div class="row"><button class="btn primary" id="shClose">Gotowe</button></div>
 </dialog>
 
 <dialog id="mathDlg">
@@ -564,6 +637,7 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
     <tr><td>Przesuwanie widoku</td><td>kółko myszy lub gładzik</td></tr>
     <tr><td>Zoom</td><td><kbd class="k">Ctrl</kbd> + kółko myszy</td></tr>
     <tr><td>Szukaj / polecenia</td><td><kbd class="k">Ctrl</kbd>+<kbd class="k">K</kbd></td></tr>
+    <tr><td>Konto, chmura i udostępnianie</td><td>ikona konta w nagłówku; <b>Plik → Udostępnij tablicę…</b></td></tr>
     <tr><td>Kalkulator</td><td><kbd class="k">C</kbd> (panel można przeciągać)</td></tr>
     <tr><td>Wzory, trójkąty, wykresy funkcji</td><td>menu <b>Wstaw → Matematyka</b></td></tr>
     <tr><td>Asystent AI</td><td><kbd class="k">Ctrl</kbd>+<kbd class="k">J</kbd> lub prawy przycisk → Zapytaj AI</td></tr>
@@ -581,6 +655,8 @@ body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   <div class="row"><button class="btn primary" id="helpClose">Zamknij</button></div>
 </dialog>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
 <script>
 (()=>{
 'use strict';
@@ -624,6 +700,7 @@ const ICONS={
   search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   al_l:'<path d="M4 3v18M8 6h12M8 14h7"/>',al_c:'<path d="M12 3v18M5 7h14M8 15h8"/>',al_r:'<path d="M20 3v18M4 6h12M9 14h7"/>',
   al_t:'<path d="M3 4h18M6 8v12M14 8v7"/>',al_m:'<path d="M3 12h18M7 5v14M15 8v8"/>',al_b:'<path d="M3 20h18M6 4v12M14 9v7"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   calc:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>',
   spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
   send:'<path d="M5 12l14-7-5 14-2.5-5.5z"/>',
@@ -660,6 +737,8 @@ const KEY='workdocs.v1';
 const coarse=()=>matchMedia('(pointer:coarse)').matches||innerWidth<700;
 const touches=new Map();
 let pinch=null,gesture=false,lpT=0,lp0=null,lpFired=false,lastTap=null,lastDbl=0,aiOpenFlag=false;
+const cloud={sb:null,user:null,status:'off'};
+const RT=new Map();
 
 /* ---------- stan ---------- */
 const mkBoard=name=>({id:uid(),name,els:[],view:{x:260,y:150,z:1}});
@@ -706,12 +785,17 @@ function clean(e){
   if(e.text!=null)o.text=String(e.text).slice(0,5000);
   return o;
 }
-const cleanBoard=b=>({id:uid(),name:String(b&&b.name||'Tablica').slice(0,60),
-  els:(Array.isArray(b&&b.els)?b.els:[]).map(clean).filter(Boolean),
-  view:{x:num(b&&b.view&&b.view.x,260),y:num(b&&b.view&&b.view.y,150),z:clamp(num(b&&b.view&&b.view.z,1)||1,.15,4)}});
+const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const cleanBoard=(b,keepCloud)=>{
+  const o={id:uid(),name:String(b&&b.name||'Tablica').slice(0,60),
+    els:(Array.isArray(b&&b.els)?b.els:[]).map(clean).filter(Boolean),
+    view:{x:num(b&&b.view&&b.view.x,260),y:num(b&&b.view&&b.view.y,150),z:clamp(num(b&&b.view&&b.view.z,1)||1,.15,4)}};
+  if(keepCloud&&b&&b.cloud&&UUID_RE.test(String(b.cloud.id))&&['owner','edit','view'].includes(b.cloud.role))o.cloud={id:String(b.cloud.id).toLowerCase(),role:b.cloud.role};
+  return o;
+};
 let state=(()=>{
   try{const j=JSON.parse(localStorage.getItem(KEY));if(j)mergeImgs(j.imgs);
-    if(j&&Array.isArray(j.boards)&&j.boards.length)return{boards:j.boards.map(cleanBoard),cur:clamp(num(j.cur),0,j.boards.length-1),snap:!!j.snap,grid:j.grid!==false};
+    if(j&&Array.isArray(j.boards)&&j.boards.length)return{boards:j.boards.map(b=>cleanBoard(b,true)),cur:clamp(num(j.cur),0,j.boards.length-1),snap:!!j.snap,grid:j.grid!==false};
   }catch(e){}
   return{boards:[mkBoard('Tablica 1')],cur:0,snap:false,grid:true};
 })();
@@ -725,9 +809,9 @@ const hists=new Map();
 let saveT=0,warned=false;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify({...state,imgs:usedImgs()}));}catch(e){if(!warned){warned=true;toast('Brak miejsca w pamięci przeglądarki — pobierz tablicę jako JSON');}}},250);}
 const H=()=>{const b=board();let h=hists.get(b.id);if(!h){h={undo:[],redo:[],cur:JSON.stringify(b.els)};hists.set(b.id,h);}return h;};
-function commit(){const h=H(),s=JSON.stringify(board().els);if(s!==h.cur){h.undo.push(h.cur);if(h.undo.length>100)h.undo.shift();h.cur=s;h.redo=[];}save();updateUndo();}
-function undo(){commitEdit();const h=H();if(!h.undo.length)return;h.redo.push(h.cur);h.cur=h.undo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();}
-function redo(){commitEdit();const h=H();if(!h.redo.length)return;h.undo.push(h.cur);h.cur=h.redo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();}
+function commit(){const h=H(),s=JSON.stringify(board().els);if(s!==h.cur){h.undo.push(h.cur);if(h.undo.length>100)h.undo.shift();h.cur=s;h.redo=[];}save();updateUndo();cloudSchedule();}
+function undo(){commitEdit();const h=H();if(!h.undo.length)return;h.redo.push(h.cur);h.cur=h.undo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();cloudSchedule();}
+function redo(){commitEdit();const h=H();if(!h.redo.length)return;h.undo.push(h.cur);h.cur=h.redo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();cloudSchedule();}
 function pruneSel(){for(const id of [...sel])if(!find(id))sel.delete(id);}
 function updateUndo(){const h=H();$('#undo').disabled=!h.undo.length;$('#redo').disabled=!h.redo.length;}
 
@@ -1164,6 +1248,7 @@ function refreshEl(e){
   const n=$(`#els [data-id="${e.id}"]`);if(!n)return render();
   n.setAttribute('opacity',e.op);n.innerHTML=inner(e);
   if(!isLine(e))syncConns(e.id);
+  liveHook(e);
 }
 
 /* ---------- widok ---------- */
@@ -1178,7 +1263,7 @@ function applyView(){
   stage.style.backgroundPosition=`${v.x-g/2}px ${v.y-g/2}px`;
   stage.classList.toggle('nogrid',!state.grid||g<9);
   $('#zVal').textContent=Math.round(v.z*100)+'%';
-  renderSel();
+  renderSel();positionCursors();
 }
 function toWorld(ev){const r=svg.getBoundingClientRect(),v=view();return{x:(ev.clientX-r.left-v.x)/v.z,y:(ev.clientY-r.top-v.y)/v.z};}
 function zoomAt(cx,cy,f){const v=view(),z=clamp(v.z*f,.15,4),k=z/v.z;v.x=cx-(cx-v.x)*k;v.y=cy-(cy-v.y)*k;v.z=z;applyView();save();}
@@ -1215,6 +1300,7 @@ function renderSel(){
 }
 function render(){
   const b=board();
+  document.body.classList.toggle('ro',isRO());
   b.els.forEach(syncConn);
   $('#els').innerHTML=b.els.map(e=>elSVG(e)).join('');
   applyView();updateProps();updateUndo();
@@ -1401,6 +1487,7 @@ svg.addEventListener('pointerdown',ev=>{
     if(touches.size>=2){beginPinch();return;}
     if(gesture)return;
   }
+  if(isRO()&&!(ev.button===1||tool==='hand'||spaceDown)){const v0=view();drag={kind:'pan',sx:ev.clientX,sy:ev.clientY,vx:v0.x,vy:v0.y};svg.classList.add('t-panning');return;}
   const v=view();
   if(ev.button===1||tool==='hand'||spaceDown){drag={kind:'pan',sx:ev.clientX,sy:ev.clientY,vx:v.x,vy:v.y};svg.classList.add('t-panning');return;}
   const p=toWorld(ev);
@@ -1467,6 +1554,7 @@ function armLongPress(ev){
   },520);
 }
 svg.addEventListener('pointermove',ev=>{
+  cursorHook(ev);
   if(ev.pointerType==='touch'&&touches.has(ev.pointerId)){
     touches.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
     if(pinch&&touches.size>=2){doPinch();return;}
@@ -1591,7 +1679,7 @@ function upHandler(ev){
 svg.addEventListener('pointerup',upHandler);
 svg.addEventListener('pointercancel',upHandler);
 function dblAt(id,ev){
-  if(tool!=='select'||Date.now()-lastDbl<500)return;
+  if(isRO()||tool!=='select'||Date.now()-lastDbl<500)return;
   lastDbl=Date.now();
   const p=toWorld(ev);
   if(id){
@@ -1624,6 +1712,7 @@ svg.addEventListener('wheel',ev=>{
   else{const v=view();v.x-=ev.deltaX;v.y-=ev.deltaY;applyView();save();}
 },{passive:false});
 function openCtxAt(target,cx,cy){
+  if(isRO())return;
   if(editing)commitEdit();hideCtx();
   const n=target.closest&&target.closest('#els [data-id]'),r=svg.getBoundingClientRect(),v=view();
   const p={x:(cx-r.left-v.x)/v.z,y:(cy-r.top-v.y)/v.z};
@@ -1652,6 +1741,7 @@ addEventListener('keydown',ev=>{
   if(ev.target.closest&&ev.target.closest('[contenteditable],textarea,input[type=text]'))return;
   if(document.querySelector('dialog[open]'))return;
   const mod=ev.ctrlKey||ev.metaKey,k=ev.key.toLowerCase();
+  if(isRO()&&!['c','?'].includes(k)&&!(mod&&k==='k'))return;
   if(mod){
     if(k==='z'){ev.preventDefault();ev.shiftKey?redo():undo();}
     else if(k==='y'){ev.preventDefault();redo();}
@@ -1683,20 +1773,31 @@ addEventListener('keyup',ev=>{if(ev.key===' '){spaceDown=false;svg.classList.rem
 /* ---------- zakładki (tablice) ---------- */
 function renderTabs(){
   const many=state.boards.length>1;
-  $('#tabs').innerHTML=state.boards.map((b,i)=>`<button class="tab ${i===state.cur?'on':''}" data-i="${i}" title="Dwuklik — zmień nazwę">${esc(b.name)}${many&&i===state.cur?'<span class="x" data-del="1" title="Usuń tablicę">×</span>':''}</button>`).join('')+'<button class="tab add" data-add="1" title="Nowa tablica">+</button>';
+  const cl=cloud.user&&board().cloud?`<span class="sync ${cloud.status}" id="syncPill">${syncHTML()}</span>`:'';
+  $('#tabs').innerHTML=state.boards.map((b,i)=>`<button class="tab ${i===state.cur?'on':''}" data-i="${i}" title="Dwuklik — zmień nazwę">${b.cloud?'☁ ':''}${esc(b.name)}${many&&i===state.cur?'<span class="x" data-del="1" title="'+(b.cloud?'Zamknij (zostaje w chmurze)':'Usuń tablicę')+'">×</span>':''}</button>`).join('')+'<button class="tab add" data-add="1" title="Nowa tablica">+</button>'+cl;
 }
-function switchBoard(i){commitEdit();state.cur=i;sel.clear();renderTabs();render();save();}
+function switchBoard(i){
+  commitEdit();cloudDetach(board());
+  state.cur=i;sel.clear();clearCursors();renderTabs();render();save();
+  const b=board();if(b.cloud)cloudStart(b,{fetch:true});
+}
 $('#tabs').addEventListener('click',e=>{
   if(e.target.dataset.add){state.boards.push(mkBoard('Tablica '+(state.boards.length+1)));switchBoard(state.boards.length-1);return;}
   const b=e.target.closest('.tab');if(!b||b.dataset.add)return;
   const i=+b.dataset.i;
-  if(e.target.dataset.del){if(confirm(`Usunąć tablicę „${state.boards[i].name}”? Tego nie da się cofnąć.`)){state.boards.splice(i,1);state.cur=Math.min(state.cur,state.boards.length-1);switchBoard(state.cur);}return;}
+  if(e.target.dataset.del){
+    const bd=state.boards[i],msg=bd.cloud?`Zamknąć tablicę „${bd.name}”? W chmurze zostanie — otworzysz ją ponownie z menu Konto i chmura.`:`Usunąć tablicę „${bd.name}”? Tego nie da się cofnąć.`;
+    if(confirm(msg)){cloudDetach(bd);state.boards.splice(i,1);state.cur=Math.min(state.cur,state.boards.length-1);switchBoard(state.cur);}
+    return;
+  }
   if(i!==state.cur)switchBoard(i);
 });
 $('#tabs').addEventListener('dblclick',e=>{
   const b=e.target.closest('.tab');if(!b||b.dataset.add)return;
-  const i=+b.dataset.i,n=prompt('Nazwa tablicy:',state.boards[i].name);
-  if(n&&n.trim()){state.boards[i].name=n.trim().slice(0,40);renderTabs();save();}
+  const i=+b.dataset.i,bd=state.boards[i];
+  if(bd.cloud&&bd.cloud.role!=='owner'){toast('Nazwę tablicy zmienia tylko jej właściciel');return;}
+  const n=prompt('Nazwa tablicy:',bd.name);
+  if(n&&n.trim()){bd.name=n.trim().slice(0,40);renderTabs();save();cloudRename(bd);}
 });
 
 /* ---------- szablony ---------- */
@@ -1804,6 +1905,7 @@ $('#mFile').addEventListener('click',e=>{
   const a=e.target.closest('[data-act]');if(!a)return;
   $('#mFile').classList.remove('open');commitEdit();
   switch(a.dataset.act){
+    case'share':shareCurrent();break;
     case'png':exportPNG();break;
     case'svg':{const s=exportSVG();if(!s)return toast('Tablica jest pusta');download(new Blob([s.svg],{type:'image/svg+xml'}),fname()+'.svg');toast('Pobrano SVG');break;}
     case'print':if(!board().els.length)return toast('Tablica jest pusta');buildPrint();setTimeout(()=>print(),60);break;
@@ -1818,7 +1920,7 @@ async function importFile(f){
     const j=JSON.parse(await f.text());mergeImgs(j.imgs);
     const list=Array.isArray(j.boards)?j.boards:j.board?[j.board]:Array.isArray(j.els)?[j]:null;
     if(!list)throw 0;
-    const nb=list.slice(0,20).map(cleanBoard);
+    const nb=list.slice(0,20).map(b=>cleanBoard(b,false));
     state.boards.push(...nb);switchBoard(state.boards.length-nb.length);fit();toast('Wczytano tablicę');
   }catch(e){toast('To nie jest poprawny plik Work Docs');}
 }
@@ -1872,7 +1974,7 @@ function addImageFile(file,at){
 $('#imgIn').addEventListener('change',ev=>{[...ev.target.files].forEach((f,i)=>addImageFile(f,(()=>{const c=viewCenter();return{x:c.x+i*30,y:c.y+i*30};})()));ev.target.value='';});
 stage.addEventListener('dragover',e=>e.preventDefault());
 stage.addEventListener('drop',e=>{
-  e.preventDefault();const p=toWorld(e);
+  e.preventDefault();if(isRO())return;const p=toWorld(e);
   [...e.dataTransfer.files].forEach((f,i)=>{
     if(f.type.startsWith('image/'))addImageFile(f,{x:p.x+i*30,y:p.y+i*30});
     else if(/\.json$/i.test(f.name))importFile(f);
@@ -1885,7 +1987,7 @@ document.addEventListener('copy',ev=>{
   ev.clipboardData.setData('text/plain','[Work Docs]');ev.preventDefault();toast('Skopiowano');
 });
 addEventListener('paste',ev=>{
-  if((ev.target.closest&&ev.target.closest('[contenteditable],input,textarea'))||document.querySelector('dialog[open]'))return;
+  if((ev.target.closest&&ev.target.closest('[contenteditable],input,textarea'))||document.querySelector('dialog[open]')||isRO())return;
   const cd=ev.clipboardData;if(!cd)return;
   const img=[...cd.items].find(i=>i.type.startsWith('image/'));
   if(img){ev.preventDefault();addImageFile(img.getAsFile());return;}
@@ -1962,6 +2064,7 @@ function paletteItems(){
   add('Pobierz jako PNG','Plik',exportPNG);
   add('Drukuj / zapisz jako PDF','Plik',()=>$('#mFile [data-act=print]').click());
   add('Zapytaj AI','Asystent',()=>openAI());
+  add('Konto i chmura (logowanie, moje tablice)','Chmura',()=>openCloud());add('Udostępnij tę tablicę…','Chmura',shareCurrent);
   add('Kalkulator','Matematyka',()=>toggleCalc(true));add('Wzór / równanie','Matematyka',()=>openMath(null));add('Wykres funkcji','Matematyka',insertFunc);
   Object.entries(POLY).forEach(([k,P])=>add(P.n,'Figura',()=>insertPoly(k)));
   add('Tryb fiszek','Nauka',startCards);add('Tryb prezentacji','Widok',()=>setPresent(true));add('Timer nauki — start / pauza','Nauka',pomoToggle);
@@ -2154,7 +2257,7 @@ function canvasMenu(p){
     {l:'Dodaj karteczkę tutaj',run:()=>{const e=newNote(p);board().els.push(e);startEdit(e.id);}}
   ];
   if(clip.length)items.push({l:'Wklej',k:'Ctrl+V',run:pasteInternal});
-  items.push('-',{l:'Zaznacz wszystko',k:'Ctrl+A',run:()=>{setTool('select');sel=new Set(board().els.map(x=>x.id));renderSel();updateProps();}},{l:'Dopasuj widok',run:fit});
+  items.push('-',{l:'Udostępnij tablicę…',run:shareCurrent},{l:'Zaznacz wszystko',k:'Ctrl+A',run:()=>{setTool('select');sel=new Set(board().els.map(x=>x.id));renderSel();updateProps();}},{l:'Dopasuj widok',run:fit});
   return items;
 }
 
@@ -2640,7 +2743,485 @@ function applyAI(r){
   return total;
 }
 
+/* ---------- chmura: Supabase (konta, zapis, udostępnianie, live) ---------- */
+// Wszystkie obiekty w bazie mają sufiks _workdocs (wspólny Supabase z innymi projektami).
+const CFG=window.WORKDOCS_CONFIG||{};
+const T_B='boards_workdocs',T_M='board_members_workdocs',T_E='board_elements_workdocs',T_I='board_images_workdocs';
+const rcurs=new Map();
+let lastTs=0,curT=0,authMode='login',authBusy=false,shId=null,shName='';
+function isRO(){const b=board();return !!(b&&b.cloud&&b.cloud.role==='view');}
+const nextTs=()=>{lastTs=Math.max(Date.now()*1000,lastTs+1);return lastTs;};
+const hue=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h;};
+const peerColor=email=>`hsl(${hue(email)} 62% 44%)`;
+const boardOf=rt=>state.boards.find(x=>x.cloud&&x.cloud.id===rt.cid);
+const newRT=cid=>({cid,synced:new Map(),ts:new Map(),z:new Map(),imgs:new Set(),live:new Map(),liveIds:new Set(),remoteLive:new Set(),dirtyIds:new Set(),peerCount:0,myKey:uid(),liveOK:false});
+function syncHTML(){const m={saved:'Zapisano w chmurze',saving:'Zapisywanie…',error:'Błąd zapisu — ponawiam',offline:'Brak połączenia'};return`<i class="dot"></i>${m[cloud.status]||''}`;}
+function setStatus(s){cloud.status=s;const p=$('#syncPill');if(p){p.className='sync '+s;p.innerHTML=syncHTML();}}
+const authErr=m=>{m=String(m||'');
+  if(/invalid login/i.test(m))return'Nieprawidłowy e-mail lub hasło.';
+  if(/already registered|already been registered|exists/i.test(m))return'Konto z tym e-mailem już istnieje — zaloguj się.';
+  if(/at least 6|weak|short/i.test(m))return'Hasło musi mieć co najmniej 6 znaków.';
+  if(/not confirmed/i.test(m))return'E-mail nie jest potwierdzony — sprawdź skrzynkę.';
+  if(/rate limit|too many/i.test(m))return'Za dużo prób — odczekaj chwilę.';
+  if(/valid email|invalid.*email/i.test(m))return'Podaj poprawny adres e-mail.';
+  return'Błąd: '+m;};
+
+function cloudInit(){
+  if(!CFG.supabaseUrl||!CFG.supabaseAnonKey||!window.supabase){cloud.status='off';return;}
+  try{
+    cloud.sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{storageKey:'sb-auth-workdocs',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:40}}});
+  }catch(e){cloud.sb=null;return;}
+  cloud.sb.auth.onAuthStateChange((evt,session)=>{
+    const u=session&&session.user?{id:session.user.id,email:String(session.user.email||'').toLowerCase()}:null;
+    const was=cloud.user;cloud.user=u;
+    setTimeout(()=>{ // nie wywołujemy zapytań bezpośrednio w callbacku
+      updateAccUI();
+      if(!u){
+        if(was||evt==='SIGNED_OUT'||evt==='INITIAL_SESSION')cloudSignedOut();
+        if(evt==='INITIAL_SESSION'&&new URLSearchParams(location.search).get('board'))openCloud('Zaloguj się, aby otworzyć udostępnioną tablicę.');
+      }else if(!was||was.id!==u.id)cloudSignedIn();
+    },0);
+  });
+}
+function updateAccUI(){
+  const b=$('#accBtn');
+  b.innerHTML=cloud.user?`<span class="avatar">${esc((cloud.user.email[0]||'?').toUpperCase())}</span>`:`<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS.user}</svg></i>`;
+  b.title=cloud.user?`Zalogowano: ${cloud.user.email}`:'Konto i chmura';
+  renderTabs();
+}
+async function cloudSignedIn(){
+  cloud.status='saved';renderTabs();
+  if($('#cloudDlg').open)renderCloudDlg();
+  await openFromUrl();
+  const b=board();
+  if(b.cloud){const rt=RT.get(b.cloud.id);if(!rt||!rt.dbChan)cloudStart(b,{fetch:true});}
+}
+function cloudSignedOut(){
+  for(const b of state.boards)cloudDetach(b);
+  if(state.boards.some(b=>b.cloud)){
+    state.boards=state.boards.filter(b=>!b.cloud);
+    if(!state.boards.length)state.boards=[mkBoard('Tablica 1')];
+    state.cur=clamp(state.cur,0,state.boards.length-1);sel.clear();save();
+  }
+  RT.clear();clearCursors();renderPeers([]);renderTabs();render();
+  if($('#cloudDlg').open)renderCloudDlg();
+}
+function cloudDetach(b){
+  if(!b||!b.cloud)return;
+  const rt=RT.get(b.cloud.id);if(!rt)return;
+  clearTimeout(rt.saveT);
+  if(rt.dirty&&cloud.sb&&cloud.user&&b.cloud.role!=='view')cloudPush(b);
+  for(const k of['dbChan','liveChan']){if(rt[k]&&cloud.sb){try{cloud.sb.removeChannel(rt[k]);}catch(e){}}rt[k]=null;}
+  rt.liveOK=false;rt.peerCount=0;clearTimeout(rt.liveT);rt.liveT=0;rt.live.clear();
+  renderPeers([]);
+}
+async function cloudStart(b,{fetch=true}={}){
+  if(!cloud.sb||!cloud.user||!b.cloud)return;
+  const cid=b.cloud.id;let rt=RT.get(cid);
+  if(!rt){rt=newRT(cid);RT.set(cid,rt);}
+  if(rt.starting)return;
+  rt.starting=true;setStatus('saving');
+  try{
+    if(fetch){
+      const sb=cloud.sb;
+      const[er,ir,br,mr]=await Promise.all([
+        sb.from(T_E).select('id,data,z,ts').eq('board_id',cid).order('z',{ascending:true}).range(0,9999),
+        sb.from(T_I).select('key,data').eq('board_id',cid).range(0,400),
+        sb.from(T_B).select('id,name,owner_id').eq('id',cid).maybeSingle(),
+        sb.from(T_M).select('role').eq('board_id',cid).eq('email',cloud.user.email).maybeSingle()
+      ]);
+      if(er.error)throw er.error;
+      if(!br.error&&!br.data){ // tablica usunięta lub brak dostępu — zostaje kopia lokalna
+        delete b.cloud;RT.delete(cid);save();renderTabs();render();
+        toast('Tablica nie jest już dostępna w chmurze — zachowano kopię lokalną.');return;
+      }
+      if(br.data){b.name=br.data.name||b.name;b.cloud.role=br.data.owner_id===cloud.user.id?'owner':(mr.data&&mr.data.role)||'view';}
+      (ir&&!ir.error?ir.data||[]:[]).forEach(r=>{if(imgKey(r.key)&&typeof r.data==='string'&&r.data.startsWith('data:image/')){IMGS[r.key]=r.data;rt.imgs.add(r.key);}});
+      rt.synced.clear();rt.ts.clear();rt.z.clear();rt.remoteLive.clear();
+      const els=[];
+      for(const r of er.data||[]){const el=clean(r.data);if(!el)continue;el.id=String(r.id);els.push(el);rt.synced.set(el.id,JSON.stringify(el));rt.ts.set(el.id,Number(r.ts)||0);rt.z.set(el.id,Number(r.z)||0);}
+      b.els=els;hists.delete(b.id);save();
+    }
+    attachChannels(rt);
+    setStatus('saved');renderTabs();
+    if(board()===b){pruneSel();render();}
+  }catch(e){setStatus(navigator.onLine===false?'offline':'error');toast('Nie udało się wczytać tablicy z chmury.');}
+  finally{rt.starting=false;}
+  if(!fetch)cloudSchedule();
+}
+function attachChannels(rt){
+  const sb=cloud.sb,cid=rt.cid;
+  if(!rt.dbChan){
+    rt.dbChan=sb.channel(`db_${cid}_workdocs`).on('postgres_changes',{event:'*',schema:'public',table:T_E,filter:`board_id=eq.${cid}`},p=>onRow(rt,p)).subscribe(st=>{
+      if(st==='CHANNEL_ERROR'||st==='TIMED_OUT')rt.dbDown=true;
+      else if(st==='SUBSCRIBED'&&rt.dbDown){rt.dbDown=false;resync(rt);}
+    });
+  }
+  if(!rt.liveChan){
+    const ch=sb.channel(`board_${cid}_workdocs`,{config:{private:true,broadcast:{self:false},presence:{key:rt.myKey}}});
+    ch.on('broadcast',{event:'el'},m=>onLiveEl(rt,m.payload)).on('broadcast',{event:'cursor'},m=>onCursor(rt,m.payload)).on('presence',{event:'sync'},()=>onPresence(rt))
+      .subscribe(async st=>{
+        if(st==='SUBSCRIBED'){rt.liveOK=true;try{await ch.track({email:cloud.user.email});}catch(e){}}
+        else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT'||st==='CLOSED'){rt.liveOK=false;}
+      });
+    rt.liveChan=ch;
+  }
+}
+async function resync(rt){ // po powrocie połączenia: dołącz zmiany zdalne, lokalne nadal wysyłamy
+  const b=boardOf(rt);if(!b||!cloud.sb)return;
+  const{data,error}=await cloud.sb.from(T_E).select('id,data,z,ts').eq('board_id',rt.cid).range(0,9999);
+  if(error||!data)return;
+  const have=new Set();
+  for(const r of data){have.add(String(r.id));onRow(rt,{eventType:'UPDATE',new:r});}
+  for(const id of[...rt.synced.keys()])if(!have.has(id)){rt.synced.delete(id);rt.ts.delete(id);rt.z.delete(id);const i=b.els.findIndex(e=>e.id===id);if(i>=0&&!beingEdited(id)){b.els.splice(i,1);remoteChanged(rt,b,true);}}
+}
+function beingEdited(id){
+  return!!((drag&&((drag.id===id)||(drag.orig&&drag.orig.some(o=>o.id===id))))||(editing&&editing.id===id));
+}
+/* odbiór zmian */
+function onRow(rt,p){
+  const b=boardOf(rt);if(!b)return;
+  if(p.eventType==='DELETE'){
+    const id=p.old&&p.old.id;if(!id)return;
+    rt.synced.delete(id);rt.ts.delete(id);rt.z.delete(id);rt.remoteLive.delete(id);
+    const i=b.els.findIndex(e=>e.id===id);
+    if(i>=0&&!beingEdited(id)){b.els.splice(i,1);remoteChanged(rt,b,true);}
+    return;
+  }
+  const r=p.new;if(!r||typeof r.id!=='string')return;
+  const ts=Number(r.ts)||0;if((rt.ts.get(r.id)||0)>=ts)return;
+  const oldZ=rt.z.get(r.id),z=Number(r.z)||0;
+  rt.ts.set(r.id,ts);rt.z.set(r.id,z);rt.remoteLive.delete(r.id);
+  if(beingEdited(r.id))return; // lokalna zmiana wygra przy najbliższym zapisie
+  const el=clean(r.data);if(!el)return;el.id=r.id;
+  rt.synced.set(el.id,JSON.stringify(el));
+  const i=b.els.findIndex(e=>e.id===el.id);
+  if(i>=0&&oldZ===z){b.els[i]=el;remoteChanged(rt,b,false,el.id);return;}
+  if(i>=0)b.els.splice(i,1);
+  let at=b.els.length;
+  for(let k=0;k<b.els.length;k++){const zz=rt.z.get(b.els[k].id);if(zz!==undefined&&zz>z){at=k;break;}}
+  b.els.splice(at,0,el);remoteChanged(rt,b,true);
+}
+function onLiveEl(rt,pl){
+  const b=boardOf(rt);if(!b||!pl||typeof pl!=='object')return;
+  if(Array.isArray(pl.del)){
+    let ch=false;
+    for(const id of pl.del.slice(0,200)){
+      if(typeof id!=='string'||rt.synced.has(id)||beingEdited(id))continue;
+      const i=b.els.findIndex(e=>e.id===id);if(i>=0){b.els.splice(i,1);ch=true;}rt.remoteLive.delete(id);
+    }
+    if(ch)remoteChanged(rt,b,true);
+  }
+  if(Array.isArray(pl.els))for(const raw of pl.els.slice(0,200)){
+    if(!raw||typeof raw.id!=='string'||!/^[\w-]{3,24}$/.test(raw.id)||beingEdited(raw.id))continue;
+    const el=clean(raw);if(!el)continue;el.id=raw.id;
+    const i=b.els.findIndex(e=>e.id===el.id);
+    if(i>=0){b.els[i]=el;if(rt.synced.has(el.id))rt.synced.set(el.id,JSON.stringify(el));remoteChanged(rt,b,false,el.id);}
+    else{b.els.push(el);rt.remoteLive.add(el.id);remoteChanged(rt,b,true);}
+  }
+}
+function remoteChanged(rt,b,full,id){
+  if(full)rt.needFull=true;else if(id)rt.dirtyIds.add(id);
+  if(rt.rq)return;
+  rt.rq=setTimeout(()=>{ // setTimeout zamiast rAF: zmiany muszą się stosować także w karcie w tle
+    rt.rq=0;
+    const h=hists.get(b.id);if(h)h.cur=JSON.stringify(b.els);
+    const cur=board()===b;
+    if(cur){
+      if(rt.needFull){pruneSel();render();}
+      else{
+        for(const i of rt.dirtyIds){
+          const e=b.els.find(x=>x.id===i),n=$(`#els [data-id="${i}"]`);
+          if(e&&n){n.setAttribute('opacity',e.op);n.innerHTML=inner(e);if(!isLine(e))syncConns(e.id);}else{render();break;}
+        }
+        renderSel();
+      }
+    }
+    rt.needFull=false;rt.dirtyIds.clear();save();
+  },30);
+}
+/* podgląd na żywo podczas rysowania i przeciągania */
+function liveHook(e){
+  const b=board();if(!b.cloud||!cloud.user||isRO())return;
+  const rt=RT.get(b.cloud.id);if(!rt||!rt.liveOK||!rt.peerCount)return;
+  rt.live.set(e.id,e);rt.liveIds.add(e.id);
+  if(!rt.liveT)rt.liveT=setTimeout(()=>liveFlush(rt),80);
+}
+function liveFlush(rt,ids){
+  clearTimeout(rt.liveT);rt.liveT=0;
+  const b=boardOf(rt);if(!b||!rt.liveChan||!rt.liveOK)return;
+  let els,del=[];
+  if(ids){els=ids.map(id=>b.els.find(e=>e.id===id)).filter(Boolean);del=ids.filter(id=>!b.els.some(e=>e.id===id));}
+  else{els=[...rt.live.values()];rt.live.clear();}
+  for(let i=0;i<Math.max(els.length,1);i+=20){
+    const payload={els:els.slice(i,i+20),del:i===0?del:[]};
+    if(!payload.els.length&&!payload.del.length)continue;
+    try{Promise.resolve(rt.liveChan.send({type:'broadcast',event:'el',payload})).catch(()=>{});}catch(e){}
+  }
+}
+function cursorHook(ev){
+  if(!cloud.user||isRO())return;const b=board();if(!b.cloud)return;
+  const rt=RT.get(b.cloud.id);if(!rt||!rt.liveOK||!rt.peerCount||!rt.liveChan)return;
+  const now=performance.now();if(now-curT<60)return;curT=now;
+  const p=toWorld(ev);
+  try{Promise.resolve(rt.liveChan.send({type:'broadcast',event:'cursor',payload:{k:rt.myKey,email:cloud.user.email,x:Math.round(p.x),y:Math.round(p.y)}})).catch(()=>{});}catch(e){}
+}
+function onCursor(rt,p){
+  if(!p||typeof p.email!=='string'||p.k===rt.myKey||!Number.isFinite(p.x)||!Number.isFinite(p.y)||boardOf(rt)!==board())return;
+  const key=p.k||p.email;let c=rcurs.get(key);
+  if(!c){
+    const el=document.createElement('div'),col=peerColor(p.email);el.className='rcur';
+    el.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 3l16 7-7 2-2 7z" fill="${col}" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg><span style="background:${col}">${esc(p.email.split('@')[0].slice(0,14))}</span>`;
+    $('#cursors').appendChild(el);c={el,x:0,y:0,t:0,email:p.email};rcurs.set(key,c);
+  }
+  c.x=p.x;c.y=p.y;c.t=Date.now();positionCursors();
+}
+function positionCursors(){const v=view();for(const c of rcurs.values())c.el.style.transform=`translate(${c.x*v.z+v.x}px,${c.y*v.z+v.y}px)`;}
+function clearCursors(){for(const c of rcurs.values())c.el.remove();rcurs.clear();}
+setInterval(()=>{const now=Date.now();for(const[k,c]of rcurs)if(now-c.t>6000){c.el.remove();rcurs.delete(k);}},2000);
+function onPresence(rt){
+  const st=rt.liveChan?rt.liveChan.presenceState():{},list=[],seen=new Set();let others=0;
+  for(const key in st){
+    if(key===rt.myKey)continue;
+    for(const m of st[key]||[]){if(!m||typeof m.email!=='string')continue;others++;if(!seen.has(m.email)){seen.add(m.email);list.push(m);}}
+  }
+  rt.peerCount=others;
+  if(boardOf(rt)===board())renderPeers(list);
+  for(const[k,c]of rcurs)if(!seen.has(c.email)){c.el.remove();rcurs.delete(k);}
+}
+function renderPeers(list){
+  $('#peers').innerHTML=list.slice(0,6).map(m=>`<span class="pc" style="background:${peerColor(m.email)}" title="${esc(m.email)}">${esc((m.email[0]||'?').toUpperCase())}</span>`).join('')+(list.length>6?`<span class="pc" style="background:#8A7A6B">+${list.length-6}</span>`:'');
+}
+/* zapis zmian (tylko różnice) */
+function cloudSchedule(){
+  const b=board();if(!b||!b.cloud||!cloud.sb||!cloud.user||b.cloud.role==='view')return;
+  const rt=RT.get(b.cloud.id);if(!rt||rt.starting)return;
+  rt.dirty=true;setStatus('saving');clearTimeout(rt.saveT);rt.saveT=setTimeout(()=>cloudPush(b),450);
+}
+async function cloudPush(b){
+  const rt=b.cloud&&RT.get(b.cloud.id);
+  if(!rt||!cloud.sb||!cloud.user||b.cloud.role==='view')return;
+  if(rt.pushing){rt.again=true;return;}
+  rt.pushing=true;rt.again=false;rt.dirty=false;
+  const cid=rt.cid;
+  try{
+    const ups=[],cur=new Map(),els=b.els;let prevZ=-Infinity;
+    for(let i=0;i<els.length;i++){
+      const e=els[i];if(rt.remoteLive.has(e.id)&&!rt.synced.has(e.id))continue;
+      let z=rt.z.get(e.id);
+      if(z===undefined||z<=prevZ){
+        if(prevZ===-Infinity){let nz;for(let k=i+1;k<els.length;k++){const q=rt.z.get(els[k].id);if(q!==undefined){nz=q;break;}}z=nz!==undefined?nz-1:0;}
+        else z=prevZ+1;
+      }
+      prevZ=z;
+      const json=JSON.stringify(e);cur.set(e.id,json);
+      if(rt.synced.get(e.id)!==json||rt.z.get(e.id)!==z)ups.push({e,json,z});
+    }
+    const dels=[...rt.synced.keys()].filter(id=>!cur.has(id));
+    const imgRows=[];
+    for(const u of ups)if(u.e.type==='image'&&IMGS[u.e.src]&&!rt.imgs.has(u.e.src)&&!imgRows.some(r=>r.key===u.e.src))imgRows.push({board_id:cid,key:u.e.src,data:IMGS[u.e.src]});
+    if(imgRows.length){const{error}=await cloud.sb.from(T_I).upsert(imgRows,{onConflict:'board_id,key',ignoreDuplicates:true});if(error)throw error;imgRows.forEach(r=>rt.imgs.add(r.key));}
+    for(let i=0;i<ups.length;i+=60){
+      const chunk=ups.slice(i,i+60),rows=chunk.map(u=>({board_id:cid,id:u.e.id,data:JSON.parse(u.json),z:u.z,ts:nextTs(),updated_by:cloud.user.id}));
+      const{error}=await cloud.sb.from(T_E).upsert(rows,{onConflict:'board_id,id'});if(error)throw error;
+      chunk.forEach((u,k)=>{rt.synced.set(u.e.id,u.json);rt.z.set(u.e.id,u.z);rt.ts.set(u.e.id,rows[k].ts);rt.remoteLive.delete(u.e.id);});
+    }
+    for(let i=0;i<dels.length;i+=100){
+      const part=dels.slice(i,i+100),{error}=await cloud.sb.from(T_E).delete().eq('board_id',cid).in('id',part);if(error)throw error;
+      part.forEach(id=>{rt.synced.delete(id);rt.ts.delete(id);rt.z.delete(id);});
+    }
+    const ids=[...rt.liveIds];rt.liveIds.clear();if(ids.length)liveFlush(rt,ids);
+    if(board()===b)setStatus(rt.again||rt.dirty?'saving':'saved');
+  }catch(e){
+    const msg=String(e&&e.message||e);
+    setStatus(navigator.onLine===false?'offline':'error');
+    if(/row-level security|permission/i.test(msg))toast('Brak uprawnień do zapisu tej tablicy.');
+    rt.dirty=true;clearTimeout(rt.retryT);rt.retryT=setTimeout(()=>{const bb=boardOf(rt);if(bb)cloudPush(bb);},5000);
+  }finally{
+    rt.pushing=false;
+    if(rt.again){rt.again=false;setTimeout(()=>cloudPush(b),50);}
+  }
+}
+function cloudRename(b){
+  if(b.cloud&&b.cloud.role==='owner'&&cloud.sb&&cloud.user)cloud.sb.from(T_B).update({name:b.name}).eq('id',b.cloud.id).then(({error})=>{if(error)toast('Nie udało się zmienić nazwy w chmurze.');});
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden)return;
+  const b=board();if(!b.cloud)return;const rt=RT.get(b.cloud.id);
+  if(rt&&rt.dirty){clearTimeout(rt.saveT);cloudPush(b);}
+});
+addEventListener('online',()=>{const b=board();if(b.cloud){setStatus('saving');const rt=RT.get(b.cloud.id);if(rt)rt.dirty=true;cloudPush(b);}});
+addEventListener('offline',()=>{if(board().cloud)setStatus('offline');});
+
+/* okno: konto i lista tablic */
+function openCloud(msg){
+  if(!cloud.sb){toast('Chmura nie jest jeszcze skonfigurowana (uzupełnij config.js).');return;}
+  commitEdit();renderCloudDlg();
+  if(msg&&!cloud.user){$('#authMsg').className='authmsg ok';$('#authMsg').textContent=msg;}
+  if(!$('#cloudDlg').open)$('#cloudDlg').showModal();
+}
+function renderCloudDlg(){
+  const li=!!cloud.user;
+  $('#authView').style.display=li?'none':'block';$('#listView').style.display=li?'block':'none';
+  $('#cloudTitle').textContent=li?'Twoje tablice w chmurze':'Konto i chmura';
+  if(li){$('#whoEmail').textContent=cloud.user.email;loadCloudList();}else setAuthMode(authMode);
+}
+function setAuthMode(m){
+  authMode=m;$$('#authTabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  $('#authGo').textContent=m==='login'?'Zaloguj się':'Utwórz konto';
+  $('#aPass').autocomplete=m==='login'?'current-password':'new-password';
+  $('#authMsg').textContent='';$('#authMsg').className='authmsg';
+  if(m==='login')$('#aCode').style.display='none';
+}
+function authMsg(t,ok){$('#authMsg').textContent=t;$('#authMsg').className='authmsg'+(ok?' ok':'');}
+async function authGo(){
+  if(authBusy||!cloud.sb)return;
+  const email=$('#aEmail').value.trim().toLowerCase(),pass=$('#aPass').value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return authMsg('Podaj poprawny adres e-mail.');
+  if(pass.length<6)return authMsg('Hasło musi mieć co najmniej 6 znaków.');
+  authBusy=true;$('#authGo').disabled=true;authMsg('');
+  const login=async()=>{const{error}=await cloud.sb.auth.signInWithPassword({email,password:pass});if(error)authMsg(authErr(error.message));else{$('#aPass').value='';}};
+  try{
+    if(authMode==='login')await login();
+    else{
+      let created=false,stop=false;
+      try{
+        const r=await fetch('/api/register_workdocs',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password:pass,code:$('#aCode').value.trim()})});
+        const j=await r.json().catch(()=>({}));
+        if(r.ok)created=true;
+        else if(j.needCode){$('#aCode').style.display='block';authMsg(j.error||'Podaj kod rejestracji.');stop=true;}
+        else if(r.status===409||r.status===400||r.status===403||r.status===429){authMsg(j.error||'Nie udało się utworzyć konta.');stop=true;}
+      }catch(e){/* brak endpointu — spróbujemy zwykłej rejestracji */}
+      if(!stop){
+        if(created)await login();
+        else{
+          const{data,error}=await cloud.sb.auth.signUp({email,password:pass});
+          if(error)authMsg(authErr(error.message));
+          else if(!data.session)authMsg('Konto utworzone. Potwierdź e-mail w skrzynce (w Supabase włączone jest potwierdzanie) i zaloguj się.',true);
+        }
+      }
+    }
+  }finally{authBusy=false;$('#authGo').disabled=false;}
+}
+$('#authTabs').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)setAuthMode(b.dataset.m);});
+$('#authGo').onclick=authGo;
+$('#aPass').addEventListener('keydown',e=>{if(e.key==='Enter')authGo();});
+$('#aEmail').addEventListener('keydown',e=>{if(e.key==='Enter')$('#aPass').focus();});
+$('#logoutBtn').onclick=async()=>{$('#cloudDlg').close();if(cloud.sb)await cloud.sb.auth.signOut();toast('Wylogowano');};
+$('#cloudClose').onclick=()=>$('#cloudDlg').close();
+$('#accBtn').onclick=()=>openCloud();
+async function loadCloudList(){
+  const box=$('#cList');box.innerHTML='<p class="hint">Wczytywanie…</p>';
+  const sb=cloud.sb;
+  const[br,mr]=await Promise.all([sb.from(T_B).select('id,name,owner_id,updated_at').order('updated_at',{ascending:false}),sb.from(T_M).select('board_id,role,email')]);
+  if(br.error){box.innerHTML=`<p class="authmsg">Nie udało się wczytać listy: ${esc(br.error.message)}</p>`;return;}
+  const mine=cloud.user.email,roles={};(mr.data||[]).forEach(m=>{if(m.email===mine)roles[m.board_id]=m.role;});
+  const items=(br.data||[]).map(b=>({id:b.id,name:b.name,role:b.owner_id===cloud.user.id?'owner':(roles[b.id]||'view'),upd:b.updated_at}));
+  cloud.list=items;
+  const lab={owner:'Twoja',edit:'Edycja',view:'Podgląd'};
+  box.innerHTML=items.length?items.map(it=>`<div class="ci2"><div><b>${esc(it.name)}<span class="badge2">${lab[it.role]}</span></b><small>${esc(new Date(it.upd).toLocaleString('pl-PL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))}</small></div><div class="ca"><button class="btn primary" data-a="open" data-id="${it.id}">Otwórz</button>${it.role==='owner'?`<button class="btn" data-a="share" data-id="${it.id}">Udostępnij</button><button class="btn" data-a="del" data-id="${it.id}">Usuń</button>`:`<button class="btn" data-a="leave" data-id="${it.id}">Opuść</button>`}</div></div>`).join(''):'<p class="hint">Nie masz jeszcze tablic w chmurze. Utwórz nową albo wyślij bieżącą.</p>';
+}
+function openCloudBoard(id,name,role){
+  id=String(id).toLowerCase();
+  let i=state.boards.findIndex(b=>b.cloud&&b.cloud.id===id);
+  if(i<0){const nb=mkBoard(name||'Tablica');nb.cloud={id,role};state.boards.push(nb);i=state.boards.length-1;}
+  else{state.boards[i].cloud.role=role;if(name)state.boards[i].name=name;}
+  switchBoard(i);
+}
+$('#cList').addEventListener('click',async ev=>{
+  const b=ev.target.closest('[data-a]');if(!b||!cloud.sb)return;
+  const id=b.dataset.id,it=(cloud.list||[]).find(x=>x.id===id);if(!it)return;
+  const a=b.dataset.a,sb=cloud.sb;
+  if(a==='open'){$('#cloudDlg').close();openCloudBoard(it.id,it.name,it.role);}
+  else if(a==='share'){$('#cloudDlg').close();openShare(it.id,it.name);}
+  else if(a==='del'){
+    if(!confirm(`Usunąć tablicę „${it.name}” na stałe? Zniknie też u osób, którym ją udostępniono.`))return;
+    const{error}=await sb.from(T_B).delete().eq('id',id);
+    if(error)return toast('Nie udało się usunąć: '+error.message);
+    dropLocalCloudBoard(id);loadCloudList();
+  }else if(a==='leave'){
+    if(!confirm(`Opuścić tablicę „${it.name}”? Stracisz do niej dostęp.`))return;
+    const{error}=await sb.from(T_M).delete().eq('board_id',id).eq('email',cloud.user.email);
+    if(error)return toast('Nie udało się opuścić: '+error.message);
+    dropLocalCloudBoard(id);loadCloudList();
+  }
+});
+function dropLocalCloudBoard(id){
+  const i=state.boards.findIndex(b=>b.cloud&&b.cloud.id===id);if(i<0)return;
+  cloudDetach(state.boards[i]);RT.delete(id);state.boards.splice(i,1);
+  if(!state.boards.length)state.boards.push(mkBoard('Tablica 1'));
+  state.cur=clamp(state.cur,0,state.boards.length-1);switchBoard(state.cur);
+}
+$('#cNew').onclick=async()=>{
+  const n=prompt('Nazwa nowej tablicy:','Nowa tablica');if(!n||!n.trim()||!cloud.sb)return;
+  const{data,error}=await cloud.sb.from(T_B).insert({name:n.trim().slice(0,60)}).select('id,name').single();
+  if(error)return toast('Nie udało się utworzyć tablicy: '+error.message);
+  $('#cloudDlg').close();openCloudBoard(data.id,data.name,'owner');
+};
+$('#cUpload').onclick=async()=>{
+  const b=board();if(b.cloud)return toast('Ta tablica już jest w chmurze.');
+  const{data,error}=await cloud.sb.from(T_B).insert({name:b.name}).select('id').single();
+  if(error)return toast('Nie udało się wysłać tablicy: '+error.message);
+  b.cloud={id:String(data.id).toLowerCase(),role:'owner'};save();
+  $('#cloudDlg').close();renderTabs();render();cloudStart(b,{fetch:false});toast('Tablica wysłana do chmury.');
+};
+async function openFromUrl(){
+  const id=(new URLSearchParams(location.search).get('board')||'').toLowerCase();
+  if(!UUID_RE.test(id)||!cloud.sb||!cloud.user)return;
+  try{history.replaceState(null,'',location.pathname);}catch(e){}
+  const{data,error}=await cloud.sb.from(T_B).select('id,name,owner_id').eq('id',id).maybeSingle();
+  if(error||!data){toast(`Brak dostępu do tej tablicy — poproś właściciela o udostępnienie na Twój e-mail (${cloud.user.email}).`);return;}
+  let role=data.owner_id===cloud.user.id?'owner':'view';
+  if(role!=='owner'){const{data:m}=await cloud.sb.from(T_M).select('role').eq('board_id',id).eq('email',cloud.user.email).maybeSingle();if(m)role=m.role;}
+  if($('#cloudDlg').open)$('#cloudDlg').close();
+  openCloudBoard(data.id,data.name,role);
+}
+/* okno: udostępnianie */
+async function openShare(id,name){
+  shId=id;shName=name;$('#shName').textContent=`Tablica: ${name}`;$('#shMsg').textContent='';$('#shEmail').value='';
+  $('#shareDlg').showModal();loadMembers();
+}
+async function loadMembers(){
+  const box=$('#shList');box.innerHTML='<p class="hint">Wczytywanie…</p>';
+  const{data,error}=await cloud.sb.from(T_M).select('id,email,role').eq('board_id',shId).order('created_at');
+  if(error){box.innerHTML=`<p class="authmsg">${esc(error.message)}</p>`;return;}
+  box.innerHTML=(data||[]).length?data.map(m=>`<div class="ci2"><div><b>${esc(m.email)}</b></div><div class="ca"><select data-r="${m.id}"><option value="edit"${m.role==='edit'?' selected':''}>Może edytować</option><option value="view"${m.role==='view'?' selected':''}>Tylko podgląd</option></select><button class="btn" data-rm="${m.id}">Usuń dostęp</button></div></div>`).join(''):'<p class="hint">Nikomu jeszcze nie udostępniono tej tablicy.</p>';
+}
+$('#shAdd').onclick=async()=>{
+  const email=$('#shEmail').value.trim().toLowerCase(),role=$('#shRole').value,msg=$('#shMsg');msg.className='authmsg';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){msg.textContent='Podaj poprawny adres e-mail.';return;}
+  if(email===cloud.user.email){msg.textContent='To Twoja własna tablica.';return;}
+  const{error}=await cloud.sb.from(T_M).insert({board_id:shId,email,role});
+  if(error){msg.textContent=error.code==='23505'?'Ta osoba już ma dostęp do tablicy.':'Nie udało się udostępnić: '+error.message;return;}
+  $('#shEmail').value='';msg.className='authmsg ok';msg.textContent=`Udostępniono: ${email}`;loadMembers();
+};
+$('#shEmail').addEventListener('keydown',e=>{if(e.key==='Enter')$('#shAdd').click();});
+$('#shList').addEventListener('change',async ev=>{
+  const s=ev.target.closest('[data-r]');if(!s)return;
+  const{error}=await cloud.sb.from(T_M).update({role:s.value}).eq('id',s.dataset.r);
+  if(error)toast('Nie udało się zmienić uprawnień.');else toast('Zmieniono uprawnienia.');
+});
+$('#shList').addEventListener('click',async ev=>{
+  const b=ev.target.closest('[data-rm]');if(!b)return;
+  const{error}=await cloud.sb.from(T_M).delete().eq('id',b.dataset.rm);
+  if(error)toast('Nie udało się usunąć dostępu.');else loadMembers();
+});
+$('#shLink').onclick=async()=>{
+  const link=`${location.origin}${location.pathname}?board=${shId}`;
+  try{await navigator.clipboard.writeText(link);toast('Link skopiowany');}catch(e){window.prompt('Skopiuj link:',link);}
+};
+$('#shClose').onclick=()=>$('#shareDlg').close();
+// skrót: udostępnianie bieżącej tablicy z menu kontekstowego/palety
+function shareCurrent(){
+  const b=board();
+  if(!cloud.sb||!cloud.user)return openCloud('Zaloguj się, aby udostępniać tablice.');
+  if(!b.cloud)return toast('Najpierw wyślij tę tablicę do chmury (Konto i chmura → Wyślij bieżącą tablicę).');
+  if(b.cloud.role!=='owner')return toast('Udostępniać może tylko właściciel tablicy.');
+  openShare(b.cloud.id,b.name);
+}
+
 /* ---------- start ---------- */
+cloudInit();
 setTool('select');renderTabs();render();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(!editing)render();});
 })();
