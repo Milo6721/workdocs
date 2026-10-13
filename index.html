@@ -2234,7 +2234,9 @@ ctx.addEventListener('click',ev=>{
 });
 ctx.addEventListener('contextmenu',e=>e.preventDefault());
 function elementMenu(e){
-  const items=[{l:'✨ Zapytaj AI…',k:'Ctrl+J',run:()=>openAI()},{l:'✨ AI: wyjaśnij',run:()=>openAI(AI_PRESETS.explain,true)},{l:'✨ AI: rozbuduj',run:()=>openAI(AI_PRESETS.expand,true)},{l:'✨ AI: zrób fiszki',run:()=>openAI(AI_PRESETS.cards,true)},'-'];
+  const items=e.type==='image'
+    ?[{l:'✨ Zapytaj AI…',k:'Ctrl+J',run:()=>openAI()},{l:'✨ AI: opisz obraz',run:()=>openAI(AI_PRESETS.imgDescribe,true)},{l:'✨ AI: odczytaj tekst',run:()=>openAI(AI_PRESETS.imgText,true)},{l:'✨ AI: rozwiąż zadanie',run:()=>openAI(AI_PRESETS.imgSolve,true)},'-']
+    :[{l:'✨ Zapytaj AI…',k:'Ctrl+J',run:()=>openAI()},{l:'✨ AI: wyjaśnij',run:()=>openAI(AI_PRESETS.explain,true)},{l:'✨ AI: rozbuduj',run:()=>openAI(AI_PRESETS.expand,true)},{l:'✨ AI: zrób fiszki',run:()=>openAI(AI_PRESETS.cards,true)},'-'];
   if(sel.size<2){
     if(['chart','table','math','func'].includes(e.type))items.push({l:e.type==='math'?'Edytuj wzór…':e.type==='func'?'Edytuj funkcje…':'Edytuj dane…',k:'dwuklik',run:()=>editData(e)});
     else if(!isLine(e)&&e.type!=='pen'&&e.type!=='image')items.push({l:'Edytuj tekst',k:'dwuklik',run:()=>startEdit(e.id)});
@@ -2424,6 +2426,11 @@ const AI_PRESETS={
   cards:'Na podstawie zaznaczonych treści utwórz fiszki: karteczki (shape note) z tekstem w formacie „pytanie :: odpowiedź”, layout grid.',
   sum:'Podsumuj zaznaczone treści w 3–5 punktach i wstaw jako jedną karteczkę (note).',
   en:'Przetłumacz teksty zaznaczonych elementów na angielski, używając pola update (zachowaj id).',
+  imgDescribe:'Opisz, co jest na zaznaczonym obrazie (krótko, w kilku zdaniach). Wstaw opis jako jedną karteczkę (note).',
+  imgText:'Odczytaj cały tekst widoczny na zaznaczonym obrazie i wstaw go na tablicę jako karteczkę (note) lub tabelę, jeśli to tabela. Wzory zapisz jako math.',
+  imgSolve:'Rozwiąż zadanie widoczne na zaznaczonym obrazie krok po kroku. Kroki wstaw jako karteczki (layout flow lub grid), a wzory jako math. W message podaj wynik.',
+  imgMind:'Zrób mapę myśli z treści zaznaczonego obrazu (layout mindmap).',
+  imgCards:'Na podstawie treści zaznaczonego obrazu utwórz fiszki: karteczki (shape note) z tekstem „pytanie :: odpowiedź”, layout grid.',
   color:'Zmień kolory zaznaczonych elementów na harmonijną, czytelną paletę (użyj pola update z color; kolory dobierz do znaczenia).'
 };
 const AI_COLORS={orange:['#FFE2CC',ORG],blue:['#D6E6FF','#3A6FD8'],green:['#D9F0DD','#3F9B5F'],purple:['#EBDDFB','#8B5CC9'],yellow:['#FFF0B8','#C98A0B'],red:['#FBD9D5','#D93B2B'],gray:['#EFE7DC','#8A7A6B']};
@@ -2455,8 +2462,11 @@ function aiContext(){
   };
 }
 function updateAICtx(){
-  $('#aiCtx').textContent=sel.size?`Zaznaczone: ${sel.size}`:'Cała tablica';
-  const chips=sel.size
+  const nImg=selEls().filter(e=>e.type==='image').length;
+  $('#aiCtx').textContent=sel.size?`Zaznaczone: ${sel.size}${nImg?` · obrazów: ${nImg}`:''}`:'Cała tablica';
+  const chips=nImg
+    ?[['Opisz obraz',AI_PRESETS.imgDescribe],['Odczytaj tekst',AI_PRESETS.imgText],['Rozwiąż zadanie',AI_PRESETS.imgSolve],['Mapa myśli z obrazu',AI_PRESETS.imgMind],['Fiszki z obrazu',AI_PRESETS.imgCards],['Wyjaśnij',AI_PRESETS.explain]]
+    :sel.size
     ?[['Wyjaśnij',AI_PRESETS.explain],['Rozbuduj',AI_PRESETS.expand],['Zrób fiszki',AI_PRESETS.cards],['Podsumuj',AI_PRESETS.sum],['Po angielsku',AI_PRESETS.en],['Pokoloruj',AI_PRESETS.color]]
     :[['Mapa myśli','Zrób mapę myśli na temat: ',1],['Schemat blokowy','Zrób schemat blokowy procesu: ',1],['Oś czasu','Zrób oś czasu (karteczki w układzie grid): ',1],['Wykres','Zrób wykres: ',1],['Plan nauki','Zrób plan nauki w tabeli na: ',1],['Fiszki','Zrób zestaw fiszek (karteczki „pytanie :: odpowiedź”) o: ',1]];
   $('#aiChips').innerHTML=chips.map((c,i)=>`<button data-c="${i}">${c[0]}</button>`).join('');
@@ -2474,14 +2484,41 @@ function aiMsgHTML(msg,added){
   return`<div class="aimsg">${t}${added?`<div class="aiadded">✓ Dodano lub zmieniono ${added} el. na tablicy — Ctrl+Z cofa całość</div>`:''}</div>`+
     (!added&&msg?'<button class="btn ainote" id="aiNote">Wstaw odpowiedź na tablicę</button>':'');
 }
-async function aiCall(prompt,context,retried){
+/* obrazy dla AI: zaznaczone, a bez zaznaczenia — gdy polecenie dotyczy obrazów/zdjęć */
+const AI_IMG_RE=/obraz|zdj[eęć]|rysun|screen|grafik|\bskan|odczyt|przepisz|wida[ćc]|fotk|fotograf|\bfoto\b/i;
+function aiImageEls(prompt){
+  if(sel.size)return selEls().filter(e=>e.type==='image'&&IMGS[e.src]).slice(0,4);
+  if(!AI_IMG_RE.test(prompt))return[];
+  return board().els.filter(e=>e.type==='image'&&IMGS[e.src]).slice(-3);
+}
+function shrinkImg(url,max,q){
+  return new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>{
+      const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
+      const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+      const u=c.toDataURL('image/jpeg',q);res(u.slice(u.indexOf(',')+1));
+    };
+    im.onerror=()=>res(null);im.src=url;
+  });
+}
+async function prepAiImages(els){
+  const out=[];
+  for(const e of els){const d=await shrinkImg(IMGS[e.src],1024,.8);if(d)out.push({id:e.id,media_type:'image/jpeg',data:d});}
+  if(out.reduce((a,i)=>a+i.data.length,0)>3200000){ // za dużo — zmniejsz mocniej
+    for(let i=0;i<out.length;i++){const d=await shrinkImg(IMGS[els[i].src],720,.65);if(d)out[i].data=d;}
+  }
+  return out;
+}
+async function aiCall(prompt,context,images,retried){
   const code=(()=>{try{return localStorage.getItem('workdocs.code')||'';}catch(e){return'';}})();
   let r;
-  try{r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json','x-access-code':code},body:JSON.stringify({prompt,context})});}
+  try{r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json','x-access-code':code},body:JSON.stringify({prompt,context,images:images||[]})});}
   catch(e){throw new Error('Brak połączenia z serwerem AI. Funkcja działa po wdrożeniu na Vercel (lub lokalnie przez dev-server.js).');}
   if(r.status===401&&!retried){
     const c=window.prompt('Podaj kod dostępu do AI:');
-    if(c){try{localStorage.setItem('workdocs.code',c);}catch(e){}return aiCall(prompt,context,true);}
+    if(c){try{localStorage.setItem('workdocs.code',c);}catch(e){}return aiCall(prompt,context,images,true);}
     throw new Error('Potrzebny jest kod dostępu.');
   }
   if(r.status===404||r.status===405||r.status===501)throw new Error('Nie znaleziono backendu AI (/api/ai). Wdróż projekt razem z folderem api na Vercelu.');
@@ -2497,7 +2534,9 @@ async function aiSend(){
   aiBusy=true;aiEl.classList.add('busy');
   aiShow('<div class="aimsg"><span class="aidots"><i></i><i></i><i></i></span> AI pracuje…</div>');
   try{
-    const res=await aiCall(prompt,aiContext());
+    const imgEls=aiImageEls(prompt);let images=[];
+    if(imgEls.length){aiShow(`<div class="aimsg"><span class="aidots"><i></i><i></i><i></i></span> Przygotowuję ${imgEls.length} obraz(y) dla AI…</div>`);images=await prepAiImages(imgEls);}
+    const res=await aiCall(prompt,aiContext(),images);
     const n=applyAI(res);aiLastMsg=String(res.message||'');
     aiShow(aiMsgHTML(aiLastMsg,n));$('#aiText').value='';autoGrow();
   }catch(e){aiShow(`<div class="aimsg err">${esc(e.message)}</div>`);}
