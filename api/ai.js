@@ -10,14 +10,14 @@ Użytkownik pisze polecenie. W kontekście dostajesz: selection (zaznaczone elem
 ZAWSZE odpowiadaj, wywołując narzędzie update_board (dokładnie jedno wywołanie, bez tekstu poza narzędziem).
 
 Zasady:
-- Odpowiadaj w języku użytkownika (domyślnie po polsku).
+- Język: odpowiadaj w języku podanym w <jezyk_interfejsu> (pl = polski, en = angielski). Teksty nowych elementów też pisz w tym języku, chyba że użytkownik wyraźnie prosi o inny (np. „po niemiecku”).
 - message: krótka odpowiedź lub podsumowanie dla użytkownika (maks. ok. 6 zdań). Jeśli to pytanie lub prośba o wyjaśnienie — odpowiedz w message i nie dodawaj elementów, chyba że użytkownik prosi o wstawienie na tablicę (wtedy dodaj jedną karteczkę note).
 - Teksty węzłów mają być krótkie: 1–8 słów, maks. 60 znaków. Karteczki (shape=note) mogą mieć 1–3 zdania.
 - Nigdy nie wymyślaj id istniejących elementów; używaj wyłącznie id z kontekstu. Nowe węzły mają własne, unikalne, krótkie id (n1, n2, ...).
 - Aby ROZBUDOWAĆ istniejący element, dodaj nowe węzły i krawędź from=<id istniejącego elementu> to=<id nowego węzła>. Nie umieszczaj istniejących elementów w nodes.
 - Możesz ZMIENIAĆ wszystko, co jest na tablicy, przez pole update (id z kontekstu): text, color (nazwa: orange, blue, green, purple, yellow, red, gray), fill/stroke (hex), size (s/m/l/xl), font (sans/hand/mono), line (solid/dashed/dotted), width, opacity, położenie i rozmiar (x, y, w, h — w jednostkach z kontekstu), dane wykresu (kind, title, cats, series), tabeli (rows, header), wzoru (tex), wykresu funkcji (exprs, xmin, xmax, ymin, ymax), trójkąta (vertexLabels) oraz route dla połączeń (straight/curve/elbow). Zmieniaj tylko to, o co użytkownik prosi. Usuwanie — pole delete, tylko na wyraźną prośbę.
 - Aby POŁĄCZYĆ istniejące elementy, dodaj krawędź from=<id> to=<id> (obie strony mogą być id z kontekstu).
-- Figury matematyczne: shape może być też: tri_equi (trójkąt równoboczny), tri_iso (równoramienny), tri_right (prostokątny), tri_acute (ostrokątny), tri_obtuse (rozwartokątny), trapezoid, parallelogram, pentagon, hexagon, star. Do zadań z geometrii używaj odpowiednich figur.
+- Figury matematyczne: shape może być też: tri_equi (trójkąt równoboczny), tri_iso (równoramienny), tri_right (prostokątny), tri_acute (ostrokątny), tri_obtuse (rozwartokątny), trapezoid, parallelogram, pentagon, hexagon, star, tri_right_iso (prostokątny równoramienny), kite (latawiec), octagon, right_trapezoid (trapez prostokątny), semicircle (półkole) oraz bryły: cube, cuboid, cylinder, cone, sphere, pyramid. Do zadań z geometrii używaj odpowiednich figur. Pole functions z pustą listą exprs tworzy sam układ współrzędnych (osie z siatką).
 - Wzory/równania: pole math z tex w składni LaTeX (np. \\frac{a}{b}, x^{2}, x_{1}, \\sqrt{x}, \\pi, \\alpha, \\leq, \\sum_{i=1}^{n}, \\int_{a}^{b}, \\lim_{x\\to 0}). Nie używaj znaków $.
 - Wykresy funkcji: pole functions z exprs (np. "x^2-2x-3", "sin(x)", "abs(x)", dostępne: x, + - * / ^, sin cos tan asin acos atan sqrt abs ln log exp pi e) oraz xmin/xmax.
 - Układ (layout): mindmap — pojęcia wokół tematu centralnego (pierwszy węzeł = środek); tree — hierarchia; flow — procesy i algorytmy (shape=diamond to decyzja, krawędzie z etykietami „Tak” / „Nie”, shape=ellipse to start/koniec); grid — niepowiązane karteczki i fiszki.
@@ -46,7 +46,7 @@ const TOOL = {
           properties: {
             id: { type: 'string' },
             text: { type: 'string' },
-            shape: { type: 'string', enum: ['rect', 'ellipse', 'diamond', 'note', 'tri_equi', 'tri_iso', 'tri_right', 'tri_acute', 'tri_obtuse', 'trapezoid', 'parallelogram', 'pentagon', 'hexagon', 'star'] },
+            shape: { type: 'string', enum: ['rect', 'ellipse', 'diamond', 'note', 'tri_equi', 'tri_iso', 'tri_right', 'tri_acute', 'tri_obtuse', 'trapezoid', 'parallelogram', 'pentagon', 'hexagon', 'star', 'tri_right_iso', 'kite', 'octagon', 'right_trapezoid', 'semicircle', 'cube', 'cuboid', 'cylinder', 'cone', 'sphere', 'pyramid'] },
             color: { type: 'string', enum: COLORS }
           },
           required: ['id', 'text']
@@ -204,7 +204,9 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const user = `<kontekst_tablicy>\n${context.replace(/<\/kontekst_tablicy>/gi, '')}\n</kontekst_tablicy>\n\n<polecenie_uzytkownika>\n${prompt}\n</polecenie_uzytkownika>`;
+  const lang = body.lang === 'en' ? 'en' : 'pl';
+
+  const user = `<jezyk_interfejsu>${lang}</jezyk_interfejsu>\n<kontekst_tablicy>\n${context.replace(/<\/kontekst_tablicy>/gi, '')}\n</kontekst_tablicy>\n\n<polecenie_uzytkownika>\n${prompt}\n</polecenie_uzytkownika>`;
 
   const content = [];
   images.forEach((im, i) => {
