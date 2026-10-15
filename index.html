@@ -251,6 +251,22 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
 .polys svg{width:34px;height:30px}
 #calc{display:none;right:14px;bottom:76px;width:276px;padding:12px;z-index:15;flex-direction:column;gap:8px}
 #calc.open{display:flex}
+#calc.wide{width:468px}
+#gcSvg{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:12px;touch-action:none;cursor:grab;user-select:none}
+#gcSvg:active{cursor:grabbing}
+#gcTxt{resize:vertical;font:500 13px ui-monospace,Consolas,monospace;width:100%;margin:0;text-align:left}
+.gcbar{display:flex;align-items:center;gap:6px}
+.gcbar .btn{height:32px;width:32px;padding:0;justify-content:center}
+.gcdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.gchint{font-size:11.5px;color:var(--muted);margin-left:4px}
+#peers .pc{cursor:pointer;transition:transform .15s}
+#peers .pc:hover{transform:translateY(-2px)}
+#peers .pc.fol{outline:3px solid #fff;box-shadow:0 0 0 5px var(--accent),0 2px 8px rgba(0,0,0,.25);z-index:2;position:relative}
+#followBar{display:none;left:50%;top:70px;transform:translateX(-50%);padding:7px 8px 7px 16px;align-items:center;gap:10px;font:500 13px Inter,sans-serif;z-index:20;white-space:nowrap}
+#followBar.on{display:flex}
+#followBar .fdot{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:fpulse 1.4s infinite}
+@keyframes fpulse{0%,100%{opacity:1}50%{opacity:.3}}
+#followBar button{border:0;background:var(--accent-soft);color:#B8430C;border-radius:99px;padding:5px 12px;font:600 12.5px Inter,sans-serif;cursor:pointer}
 .calch{display:flex;align-items:center;gap:8px;cursor:grab;user-select:none;touch-action:none}
 .cmode{border:1px solid var(--line);background:#fff;border-radius:8px;font:600 12px Inter,sans-serif;padding:5px 10px}
 .cmode:hover{border-color:var(--accent)}
@@ -502,13 +518,21 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
       <button class="cmode" id="calcMode" title="Stopnie / radiany">DEG</button>
       <button class="aix" id="calcClose" title="Zamknij" aria-label="Zamknij">×</button>
     </div>
-    <div class="kinds" id="calcTabs" style="margin:0"><button data-ct="calc" class="on">Kalkulator</button><button data-ct="quad">Równanie kwadratowe</button></div>
+    <div class="kinds" id="calcTabs" style="margin:0"><button data-ct="calc" class="on">Kalkulator</button><button data-ct="graph">Wykres</button><button data-ct="quad">Równanie kwadratowe</button></div>
     <div id="calcMain" class="cmain">
       <input id="calcIn" type="text" inputmode="none" autocomplete="off" spellcheck="false" placeholder="np. sin(30)+2^3" aria-label="Wyrażenie">
       <div class="calcres" id="calcRes">0</div>
       <div class="keys" id="calcKeys"></div>
       <div class="calchist" id="calcHist"></div>
       <div class="calcact"><button class="btn" id="calcIns">Wstaw na tablicę</button></div>
+    </div>
+    <div id="calcGraph" class="cmain" style="display:none">
+      <svg id="gcSvg" viewBox="0 0 440 320" data-notr aria-label="Wykres funkcji"></svg>
+      <textarea id="gcTxt" class="dfield" rows="3" spellcheck="false" autocomplete="off" placeholder="Jedna funkcja w linii, np. x^2-2x-3" data-notr>x^2-2x-3
+sin(x)</textarea>
+      <div class="gcbar"><button class="btn ico" id="gcZi" title="Powiększ"><i data-i="plus"></i></button><button class="btn ico" id="gcZo" title="Pomniejsz"><i data-i="minus"></i></button><button class="btn ico" id="gcHome" title="Widok początkowy"><i data-i="fit"></i></button><span class="gchint">Przeciągnij wykres, kółko myszy = zoom</span></div>
+      <div class="qout" id="gcRoots"></div>
+      <div class="calcact"><button class="btn" id="gcIns">Wstaw wykres na tablicę</button></div>
     </div>
     <div id="calcQuad" class="cmain" style="display:none">
       <p class="hint" style="margin:0"><b>a·x² + b·x + c = 0</b> — wpisz współczynniki (można ułamki, np. 1/2)</p>
@@ -549,6 +573,7 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
   </div>
 
   <div id="peers"></div>
+  <div id="followBar" class="panel" role="status"><span class="fdot"></span><span id="followTxt"></span><button id="followStop">Przestań śledzić</button></div>
   <div id="cursors"></div>
   <div id="roPill">Tylko podgląd</div>
   <div id="toast"></div>
@@ -1357,7 +1382,9 @@ function refreshEl(e){
 const stage=$('#stage'),svg=$('#board');
 const view=()=>board().view;
 const W=()=>stage.clientWidth,Hh=()=>stage.clientHeight;
+let following=null,followApplying=false;
 function applyView(){
+  if(following&&!followApplying)stopFollow(false);
   const v=view();
   $('#world').setAttribute('transform',`translate(${v.x} ${v.y}) scale(${v.z})`);
   const g=G*v.z;
@@ -1365,7 +1392,7 @@ function applyView(){
   stage.style.backgroundPosition=`${v.x-g/2}px ${v.y-g/2}px`;
   stage.classList.toggle('nogrid',!state.grid||g<9);
   $('#zVal').textContent=Math.round(v.z*100)+'%';
-  renderSel();positionCursors();
+  renderSel();positionCursors();viewHook();
 }
 function toWorld(ev){const r=svg.getBoundingClientRect(),v=view();return{x:(ev.clientX-r.left-v.x)/v.z,y:(ev.clientY-r.top-v.y)/v.z};}
 function zoomAt(cx,cy,f){const v=view(),z=clamp(v.z*f,.15,4),k=z/v.z;v.x=cx-(cx-v.x)*k;v.y=cy-(cy-v.y)*k;v.z=z;applyView();save();}
@@ -2632,10 +2659,59 @@ $('#calcClose').onclick=()=>toggleCalc(false);
 /* zakładka: równanie kwadratowe */
 function setCalcTab(t){
   $$('#calcTabs button').forEach(b=>b.classList.toggle('on',b.dataset.ct===t));
-  $('#calcMain').style.display=t==='calc'?'flex':'none';$('#calcQuad').style.display=t==='quad'?'flex':'none';
-  if(t==='quad')quadSolve();
+  $('#calcMain').style.display=t==='calc'?'flex':'none';$('#calcQuad').style.display=t==='quad'?'flex':'none';$('#calcGraph').style.display=t==='graph'?'flex':'none';
+  calcEl.classList.toggle('wide',t==='graph');
+  if(t==='quad')quadSolve();else if(t==='graph')gcRender();
 }
 $('#calcTabs').addEventListener('click',e=>{const b=e.target.closest('[data-ct]');if(b)setCalcTab(b.dataset.ct);});
+/* zakładka: kalkulator graficzny (wiele funkcji, przesuwanie i zoom, miejsca zerowe) */
+const gc={cx:0,cy:0,sc:32,drag:null};
+const gcSvg=$('#gcSvg'),gcTxt=$('#gcTxt');
+const gcExprs=()=>gcTxt.value.split('\n').map(s=>s.trim().replace(/^y\s*=\s*/i,'')).filter(Boolean).slice(0,6);
+function gcGeom(n){const fs=clamp(18*.6,9,18),legH=n?n*fs*1.55+10:6;return{L:38,R:424,T:10+legH,B:296};}
+function gcEl(){
+  const ex=gcExprs(),g=gcGeom(ex.length),hw=(g.R-g.L)/2/gc.sc,hh=(g.B-g.T)/2/gc.sc;
+  return{id:'gc',type:'func',x:0,y:0,w:440,h:320,exprs:ex,xmin:gc.cx-hw,xmax:gc.cx+hw,ymin:gc.cy-hh,ymax:gc.cy+hh,size:18,fill:'none'};
+}
+function gcRoots(fn,a,b){
+  const out=[],N=900,st=(b-a)/N;let px=a,py;try{py=fn(a);}catch(e){py=NaN;}
+  for(let i=1;i<=N;i++){
+    const x=a+i*st;let y;try{y=fn(x);}catch(e){y=NaN;}
+    if(Number.isFinite(py)&&Number.isFinite(y)&&py*y<0&&Math.abs(py-y)<(Math.abs(py)+Math.abs(y))*50){
+      let lo=px,hi=x,fl=py;for(let k=0;k<50;k++){const m=(lo+hi)/2,fm=fn(m);if(fl*fm<=0)hi=m;else{lo=m;fl=fm;}}const rt=(lo+hi)/2;let fr;try{fr=fn(rt);}catch(e){fr=NaN;}if(Math.abs(fr)<1e-4)out.push(rt); // odrzuca asymptoty (np. tan)
+    }else if(py===0&&Number.isFinite(py))out.push(px);
+    px=x;py=y;
+  }
+  return out.slice(0,8);
+}
+function gcRender(){
+  const e=gcEl();gcSvg.innerHTML=funcSVG(e,'');
+  const rows=e.exprs.map((q,k)=>{
+    const f=fnOf(q);if(!f.fn)return'';
+    const r=gcRoots(f.fn,e.xmin,e.xmax);
+    return`<div><span class="gcdot" style="background:${PAL[k%PAL.length]}"></span><b>${esc(q)}</b> — ${r.length?esc(tr('zera'))+': x = '+r.map(v=>String(Number(v.toPrecision(6))).replace('.',',')).join('; '):`<span class="qe">${esc(tr('brak miejsc zerowych w widoku'))}</span>`}</div>`;
+  }).join('');
+  $('#gcRoots').innerHTML=rows||`<span class="qe">${esc(tr('Wpisz funkcję, np. x^2-2x-3'))}</span>`;
+}
+function gcZoom(f,px,py){ // px,py we współrzędnych viewBox (domyślnie środek wykresu)
+  const e=gcEl(),g=gcGeom(e.exprs.length),mx=px==null?(g.L+g.R)/2:px,my=py==null?(g.T+g.B)/2:py;
+  const wx=gc.cx+(mx-(g.L+g.R)/2)/gc.sc,wy=gc.cy-(my-(g.T+g.B)/2)/gc.sc;
+  gc.sc=clamp(gc.sc*f,2,4000);gc.cx=wx-(mx-(g.L+g.R)/2)/gc.sc;gc.cy=wy+(my-(g.T+g.B)/2)/gc.sc;gcRender();
+}
+const gcPt=ev=>{const r=gcSvg.getBoundingClientRect(),k=440/r.width;return{x:(ev.clientX-r.left)*k,y:(ev.clientY-r.top)*k};};
+gcSvg.addEventListener('wheel',ev=>{ev.preventDefault();const p=gcPt(ev);gcZoom(Math.exp(-ev.deltaY*(ev.ctrlKey?.012:.0018)),p.x,p.y);},{passive:false});
+gcSvg.addEventListener('pointerdown',ev=>{gcSvg.setPointerCapture(ev.pointerId);const p=gcPt(ev);gc.drag={x:p.x,y:p.y,cx:gc.cx,cy:gc.cy};});
+gcSvg.addEventListener('pointermove',ev=>{if(!gc.drag)return;const p=gcPt(ev);gc.cx=gc.drag.cx-(p.x-gc.drag.x)/gc.sc;gc.cy=gc.drag.cy+(p.y-gc.drag.y)/gc.sc;gcRender();});
+['pointerup','pointercancel'].forEach(n=>gcSvg.addEventListener(n,()=>{gc.drag=null;}));
+gcTxt.addEventListener('input',gcRender);
+gcTxt.addEventListener('keydown',ev=>ev.stopPropagation());
+$('#gcZi').onclick=()=>gcZoom(1.4);$('#gcZo').onclick=()=>gcZoom(1/1.4);
+$('#gcHome').onclick=()=>{gc.cx=0;gc.cy=0;gc.sc=32;gcRender();};
+$('#gcIns').onclick=()=>{
+  const e=gcEl();if(!e.exprs.length)return toast(tr('Wpisz co najmniej jedną funkcję.'));
+  const c=viewCenter(),n=clean({type:'func',exprs:e.exprs,xmin:e.xmin,xmax:e.xmax,ymin:e.ymin,ymax:e.ymax,x:c.x-220,y:c.y-170,w:440,h:340,size:20});
+  if(n)place(n);
+};
 let quadRes=null;
 const fx=v=>{const s=fmtCalc(v);return s===null?'?':s;},ft=v=>fx(v).replace(',','.');
 function quadSolve(){
@@ -3164,7 +3240,7 @@ function attachChannels(rt){
   }
   if(!rt.liveChan){
     const ch=sb.channel(`board_${cid}_workdocs`,{config:{private:true,broadcast:{self:false},presence:{key:rt.myKey}}});
-    ch.on('broadcast',{event:'el'},m=>onLiveEl(rt,m.payload)).on('broadcast',{event:'sel'},m=>onSel(rt,m.payload)).on('broadcast',{event:'cursor'},m=>onCursor(rt,m.payload)).on('presence',{event:'sync'},()=>onPresence(rt))
+    ch.on('broadcast',{event:'el'},m=>onLiveEl(rt,m.payload)).on('broadcast',{event:'sel'},m=>onSel(rt,m.payload)).on('broadcast',{event:'cursor'},m=>onCursor(rt,m.payload)).on('broadcast',{event:'view'},m=>onView(rt,m.payload)).on('broadcast',{event:'viewreq'},m=>onViewReq(rt,m.payload)).on('presence',{event:'sync'},()=>onPresence(rt))
       .subscribe(async st=>{
         if(st==='SUBSCRIBED'){rt.liveOK=true;try{await ch.track({email:cloud.user.email});}catch(e){}}
         else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT'||st==='CLOSED'){rt.liveOK=false;}
@@ -3366,7 +3442,7 @@ function onCursor(rt,p){
   c.x=p.x;c.y=p.y;c.t=Date.now();positionCursors();
 }
 function positionCursors(){const v=view();for(const c of rcurs.values())c.el.style.transform=`translate(${c.x*v.z+v.x}px,${c.y*v.z+v.y}px)`;}
-function clearCursors(){for(const c of rcurs.values())c.el.remove();rcurs.clear();rsel.clear();renderPeerSel();}
+function clearCursors(){for(const c of rcurs.values())c.el.remove();rcurs.clear();rsel.clear();renderPeerSel();stopFollow(true);}
 setInterval(()=>{const now=Date.now();for(const[k,c]of rcurs)if(now-c.t>6000){c.el.remove();rcurs.delete(k);}},2000);
 function onPresence(rt){
   const st=rt.liveChan?rt.liveChan.presenceState():{},list=[],seen=new Set();let others=0;
@@ -3379,12 +3455,71 @@ function onPresence(rt){
   for(const[k,c]of rcurs)if(!seen.has(c.email)){c.el.remove();rcurs.delete(k);}
   let gone=false;for(const k of[...rsel.keys()])if(!(k in st)){rsel.delete(k);gone=true;}
   if(gone)renderPeerSel();
-  if(others>0&&!rt.hadPeers){rt.lastSel='';selHook();} // ktoś dołączył — wyślij mu moje zaznaczenie
+  if(following&&!seen.has(following.email)&&boardOf(rt)===board())stopFollow(false,true);
+  if(others>0&&!rt.hadPeers){rt.lastSel='';selHook();sendView(true);} // ktoś dołączył — wyślij mu moje zaznaczenie i widok
   rt.hadPeers=others>0;
 }
 function renderPeers(list){
-  $('#peers').innerHTML=list.slice(0,6).map(m=>`<span class="pc" style="background:${peerColor(m.email)}" title="${esc(m.email)}">${esc((m.email[0]||'?').toUpperCase())}</span>`).join('')+(list.length>6?`<span class="pc" style="background:#8A7A6B">+${list.length-6}</span>`:'');
+  $('#peers').innerHTML=list.slice(0,6).map(m=>`<span class="pc" data-em="${esc(m.email)}" style="background:${peerColor(m.email)}" title="${esc(tf('Kliknij, aby śledzić widok: {0}',m.email))}">${esc((m.email[0]||'?').toUpperCase())}</span>`).join('')+(list.length>6?`<span class="pc" style="background:#8A7A6B">+${list.length-6}</span>`:'');
+  updateFollowUI();
 }
+/* ---------- śledzenie widoku (follow): widok drugiej osoby przesuwa się u Ciebie z animacją ---------- */
+let viewT=0,viewLast=0,anim=null,animRaf=0,animFb=0;
+function sendView(force){
+  try{
+    const b=board();if(!cloud.user||isRO()||!b||!b.cloud)return;
+    const rt=RT.get(b.cloud.id);if(!rt||!rt.liveOK||!rt.liveChan||(!rt.peerCount&&!force))return;
+    const v=view(),c=viewCenter();
+    Promise.resolve(rt.liveChan.send({type:'broadcast',event:'view',payload:{k:rt.myKey,email:cloud.user.email,cx:Math.round(c.x*10)/10,cy:Math.round(c.y*10)/10,z:Math.round(v.z*1000)/1000,w:W(),h:Hh()}})).catch(()=>{});
+  }catch(e){}
+}
+function viewHook(){
+  try{
+    if(followApplying)return;
+    const wait=120-(performance.now()-viewLast);clearTimeout(viewT);
+    if(wait<=0){viewLast=performance.now();sendView();}else viewT=setTimeout(()=>{viewLast=performance.now();sendView();},wait);
+  }catch(e){}
+}
+function onViewReq(rt,p){if(!p||p.k===rt.myKey||boardOf(rt)!==board())return;sendView(true);}
+function onView(rt,p){
+  if(!p||p.k===rt.myKey||typeof p.email!=='string'||![p.cx,p.cy,p.z].every(Number.isFinite)||boardOf(rt)!==board())return;
+  (rt.views||(rt.views=new Map())).set(p.email,p);
+  if(following&&following.email===p.email)followTo(p);
+}
+function followTo(p){
+  const v=view(),c=viewCenter(),k=Math.min(1,W()/Math.max(200,p.w||W()),Hh()/Math.max(200,p.h||Hh()));
+  const z=clamp(p.z*k,.15,4);
+  anim={t0:performance.now(),dur:320,fx:c.x,fy:c.y,fz:v.z,tx:p.cx,ty:p.cy,tz:z};
+  if(!animRaf)animRaf=requestAnimationFrame(animTick);
+  clearTimeout(animFb);animFb=setTimeout(()=>{if(anim)animTick(performance.now()+1e4);},500); // zakładka w tle: bez rAF
+}
+function animTick(now){
+  animRaf=0;if(!anim)return;
+  const a=anim,t=Math.min(1,(now-a.t0)/a.dur),e=1-Math.pow(1-t,3),v=view();
+  const z=a.fz*Math.pow(a.tz/a.fz,e),cx=a.fx+(a.tx-a.fx)*e,cy=a.fy+(a.ty-a.fy)*e;
+  v.z=z;v.x=W()/2-cx*z;v.y=Hh()/2-cy*z;
+  followApplying=true;try{applyView();}finally{followApplying=false;}
+  if(t<1)animRaf=requestAnimationFrame(animTick);else{anim=null;clearTimeout(animFb);save();}
+}
+function updateFollowUI(){
+  $$('#peers .pc[data-em]').forEach(el=>el.classList.toggle('fol',!!following&&el.dataset.em===following.email));
+  const bar=$('#followBar');bar.classList.toggle('on',!!following);
+  if(following)$('#followTxt').textContent=tf('Śledzisz: {0}',following.email.split('@')[0]);
+}
+function stopFollow(announce,gone){
+  if(!following)return;const who=following.email.split('@')[0];
+  following=null;anim=null;clearTimeout(animFb);updateFollowUI();
+  if(gone)toast(tf('{0} opuścił(a) tablicę — śledzenie wyłączone',who));else if(announce!==true&&announce!==undefined)toast('Śledzenie wyłączone');
+}
+function toggleFollow(email){
+  const b=board(),rt=b&&b.cloud&&RT.get(b.cloud.id);if(!rt)return;
+  if(following&&following.email===email){stopFollow(true);return;}
+  following={email};updateFollowUI();toast(tf('Śledzisz: {0}',email.split('@')[0]));
+  const cached=rt.views&&rt.views.get(email);if(cached)followTo(cached);
+  try{if(rt.liveChan&&rt.liveOK)Promise.resolve(rt.liveChan.send({type:'broadcast',event:'viewreq',payload:{k:rt.myKey}})).catch(()=>{});}catch(e){}
+}
+$('#peers').addEventListener('click',ev=>{const b=ev.target.closest('[data-em]');if(b)toggleFollow(b.dataset.em);});
+$('#followStop').onclick=()=>stopFollow(true);
 /* zapis zmian (tylko różnice) */
 function cloudSchedule(){
   const b=board();if(!b||!b.cloud||!cloud.sb||!cloud.user||b.cloud.role==='view')return;
