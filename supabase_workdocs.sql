@@ -106,8 +106,11 @@ alter table public.board_images_workdocs    enable row level security;
 
 -- tablice
 drop policy if exists "boards_select_workdocs" on public.boards_workdocs;
+-- UWAGA: warunek właściciela jest sprawdzany bezpośrednio (nie tylko przez funkcję). Przy
+-- INSERT ... RETURNING funkcja stable nie widzi jeszcze wstawianego wiersza i baza zgłaszałaby
+-- błąd „new row violates row-level security policy".
 create policy "boards_select_workdocs" on public.boards_workdocs
-  for select to authenticated using (public.can_view_workdocs(id));
+  for select to authenticated using (owner_id = auth.uid() or public.can_view_workdocs(id));
 
 drop policy if exists "boards_insert_workdocs" on public.boards_workdocs;
 create policy "boards_insert_workdocs" on public.boards_workdocs

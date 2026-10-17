@@ -293,5 +293,18 @@ window.WORKDOCS_EN = {
   'Nie udało się wyeksportować obrazu': 'Could not export the image', 'Wczytano tablicę': 'Board loaded', 'To nie jest poprawny plik Work Docs': 'This is not a valid Work Docs file',
   'Wyczyścić całą tablicę? Możesz to jeszcze cofnąć (Ctrl+Z).': 'Clear the whole board? You can still undo this (Ctrl+Z).',
   'Nie udało się wczytać obrazu': 'Could not load the image', 'Skopiowano': 'Copied',
-  'Brak miejsca w pamięci przeglądarki — pobierz tablicę jako JSON': 'Browser storage is full — download the board as JSON'
-};
+  'Brak miejsca w pamięci przeglądarki — pobierz tablicę jako JSON': 'Browser storage is full — download the board as JSON',
+  // --- kalkulator graficzny i śledzenie widoku ---
+  'Przestań śledzić': 'Stop following', 'Śledzisz: {0}': 'Following: {0}', 'Kliknij, aby śledzić widok: {0}': 'Click to follow {0}’s view',
+  '{0} opuścił(a) tablicę — śledzenie wyłączone': '{0} left the board — following stopped', 'Śledzenie wyłączone': 'Following stopped',
+  'Jedna funkcja w linii, np. x^2-2x-3': 'One function per line, e.g. x^2-2x-3', 'Przeciągnij wykres, kółko myszy = zoom': 'Drag the graph, mouse wheel = zoom',
+  'Wstaw wykres na tablicę': 'Insert graph on the board', 'zera': 'roots', 'brak miejsc zerowych w widoku': 'no roots in view',
+  'Wpisz funkcję, np. x^2-2x-3': 'Enter a function, e.g. x^2-2x-3', 'Wpisz co najmniej jedną funkcję.': 'Enter at least one function.',
+  'Powiększ': 'Zoom in', 'Pomniejsz': 'Zoom out', 'Widok początkowy': 'Reset view',
+  // --- biblioteka matematyczna ---
+  'Matematyka': 'Mathematics', 'Biblioteka matematyczna': 'Math library', 'Biblioteka matematyczna (M)': 'Math library (M)', 'Biblioteka matematyczna…': 'Math library…',
+  'Wzory, figury, bryły, wykresy, tabele, szablony dla korepetytora': 'Formulas, shapes, solids, graphs, tables, templates for tutors',
+  'Szukaj wzoru, figury, tabeli…': 'Search formulas, shapes, tables…',
+  'Kliknij kartę, aby wstawić ją na tablicę, albo przeciągnij ją na wybrane miejsce.': 'Click a card to insert it on the board, or drag it to a chosen spot.',
+  'Wstawiono na tablicę: {0}': 'Inserted on the board: {0}'
+};

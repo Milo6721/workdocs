@@ -251,6 +251,28 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
 .polys svg{width:34px;height:30px}
 #calc{display:none;right:14px;bottom:76px;width:276px;padding:12px;z-index:15;flex-direction:column;gap:8px}
 #calc.open{display:flex}
+#mathLib{display:none;left:72px;top:64px;bottom:70px;width:376px;flex-direction:column;z-index:14;overflow:hidden;gap:0}
+#mathLib.open{display:flex}
+.mlh{display:flex;align-items:center;gap:8px;padding:12px 14px 4px}
+#mlSearch{margin:4px 14px 6px;width:auto;flex:none}
+.mlcats{display:flex;gap:6px;overflow-x:auto;padding:2px 14px 8px;flex:none;scrollbar-width:thin}
+.mlcats button{flex:none;border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 11px;font:500 12.5px Inter,sans-serif;white-space:nowrap}
+.mlcats button:hover{border-color:#F3C7A5}
+.mlcats button.on{background:var(--accent-soft);border-color:var(--accent);color:#B8430C}
+.mlsub button{font-size:11.5px;padding:3px 9px}
+#mlGrid{flex:1;overflow:auto;padding:4px 14px 10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
+#mlGrid.sym{grid-template-columns:repeat(6,1fr);gap:6px}
+.mlcard{border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px;cursor:grab;display:flex;flex-direction:column;gap:6px;min-height:96px;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.mlcard:hover{border-color:#F3C7A5;box-shadow:0 4px 14px rgba(140,70,10,.1)}
+.mlcard:active{cursor:grabbing}
+.mlprev{flex:1;display:grid;place-items:center;overflow:hidden;min-height:56px}
+.mlprev svg{max-width:100%;height:auto;max-height:84px}
+.mlname{font:600 11.5px Inter,sans-serif;color:#5b4a3b;line-height:1.25}
+.mlnote{width:100%;height:100%;border-radius:8px;padding:8px;font:500 12px/1.3 Inter,sans-serif;white-space:pre-line;overflow:hidden;border:2px solid}
+#mlGrid.sym .mlcard{min-height:0;padding:0;height:38px;align-items:center;justify-content:center;font:500 20px Inter,sans-serif}
+.mlhint{margin:0;padding:8px 14px 10px;font-size:11.5px;border-top:1px solid var(--line)}
+.mlempty{grid-column:1/-1;color:var(--muted);padding:20px 4px;text-align:center}
+.mlghost{position:fixed;z-index:80;pointer-events:none;background:var(--surface);border:2px solid var(--accent);border-radius:10px;padding:6px 12px;font:600 12.5px Inter,sans-serif;box-shadow:var(--shadow);transform:translate(-50%,-120%);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #calc.wide{width:468px}
 #gcSvg{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:12px;touch-action:none;cursor:grab;user-select:none}
 #gcSvg:active{cursor:grabbing}
@@ -347,6 +369,8 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
   #styleFab,#aiFab{display:inline-flex}
   #aiBar{left:8px;right:8px;width:auto;transform:none;bottom:126px;max-height:58%;overflow:auto}
   #calc{left:8px;right:8px;width:auto;bottom:72px;max-height:80%;overflow:auto}
+  #mathLib{left:8px;right:8px;width:auto;top:auto;bottom:72px;max-height:66%}
+  #mlGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   #peers{left:auto;right:8px;transform:none;top:10px}
   #roPill{top:auto;bottom:130px}
   .shadd{grid-template-columns:1fr}
@@ -413,6 +437,7 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
       <button data-ins="math"><b>Wzór / równanie…</b><small>Ułamki, potęgi, pierwiastki, sumy, całki</small></button>
       <button data-ins="func"><b>Wykres funkcji…</b><small>np. y = x² − 2x − 3</small></button>
       <button data-ins="axes"><b>Układ współrzędnych</b><small>Osie z siatką, do rysowania własnych wykresów</small></button>
+      <button data-ins="mathlib"><b>Biblioteka matematyczna…</b><small>Wzory, figury, bryły, wykresy, tabele, szablony dla korepetytora</small></button>
       <div class="lab">Figury i trójkąty</div>
       <div class="polys" id="polyGrid"></div>
       <div class="lab">Symbole matematyczne</div>
@@ -432,6 +457,7 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
   <button class="btn ico hide-m" id="presentBtn" title="Tryb prezentacji"><i data-i="play"></i></button>
   <button class="btn ico hide-m" id="palBtn" title="Szukaj i polecenia (Ctrl+K)"><i data-i="search"></i></button>
   <button class="btn ico hide-m" id="calcBtn" title="Kalkulator (C)"><i data-i="calc"></i></button>
+  <button class="btn ico hide-m" id="mathBtn" title="Biblioteka matematyczna (M)"><i data-i="sigma"></i></button>
   <button class="btn ico hide-m" id="accBtn" title="Konto i chmura"><i data-i="user"></i></button>
   <button class="btn lang hide-m" id="langBtn" title="Język / Language" data-notr><span class="lg on" data-l="pl">PL</span><span class="lg" data-l="en">EN</span></button>
   <span class="sep"></span>
@@ -544,6 +570,15 @@ sin(x)</textarea>
       <div class="qout" id="qOut"></div>
       <div class="calcact"><button class="btn" id="qIns">Wstaw rozwiązanie na tablicę</button></div>
     </div>
+  </section>
+
+  <section id="mathLib" class="panel" aria-label="Biblioteka matematyczna">
+    <div class="mlh"><span class="aibadge"><i data-i="sigma"></i>Matematyka</span><span class="grow"></span><button class="aix" id="mlClose" title="Zamknij" aria-label="Zamknij">×</button></div>
+    <input id="mlSearch" class="dfield" type="text" autocomplete="off" spellcheck="false" placeholder="Szukaj wzoru, figury, tabeli…">
+    <div class="mlcats" id="mlCats"></div>
+    <div class="mlcats mlsub" id="mlSub"></div>
+    <div id="mlGrid"></div>
+    <p class="hint mlhint">Kliknij kartę, aby wstawić ją na tablicę, albo przeciągnij ją na wybrane miejsce.</p>
   </section>
 
   <section id="aiBar" class="panel" aria-label="Asystent AI">
@@ -741,6 +776,7 @@ const ICONS={
   front:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>',
   back:'<rect x="4" y="4" width="12" height="12" rx="2"/><path d="M20 8v10a2 2 0 0 1-2 2H8"/>',
   fit:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  sigma:'<path d="M18 5H6l7 7-7 7h12"/>',
   grid:'<path d="M4 4h16v16H4zM4 12h16M12 4v16"/>',
   magnet:'<path d="M6 15V4h4v11a2 2 0 0 0 4 0V4h4v11a6 6 0 0 1-12 0zM6 8h4M14 8h4"/>',
   chev:'<path d="M6 9l6 6 6-6"/>',
@@ -1997,7 +2033,7 @@ document.addEventListener('click',e=>{
   if(ins){
     closeMenus();const k=ins.dataset.ins;
     if(k==='image')$('#imgIn').click();else if(k==='table')insertTable();
-    else if(k==='math')openMath(null);else if(k==='func')insertFunc();else if(k==='axes')insertAxes();
+    else if(k==='math')openMath(null);else if(k==='func')insertFunc();else if(k==='axes')insertAxes();else if(k==='mathlib')toggleMathLib(true);
     else if(k.startsWith('poly:'))insertPoly(k.slice(5));else insertChart(k);
     return;
   }
@@ -2554,7 +2590,133 @@ function buildEqSelect(){
   s_.value=cur;
 }
 buildEqSelect();
-function mathPrev(){
+/* ---------- biblioteka matematyczna (uczniowie i korepetytorzy): kliknij kartę albo przeciągnij ją na tablicę ---------- */
+const mlEl=$('#mathLib'),mlGrid=$('#mlGrid');
+const ML_CATS=[['wz','Wzory','Formulas'],['fig','Figury i bryły','Shapes & solids'],['wyk','Wykresy','Graphs'],['tab','Tabele i ściągi','Tables & cheat sheets'],['sym','Symbole','Symbols'],['kor','Dla korepetytora','For tutors']];
+const NOTE_C={y:['#FFF0B8','#C98A0B'],g:['#D9F0DD','#3F9B5F'],b:['#D6E6FF','#3A6FD8'],r:['#FBD9D5','#D93B2B'],p:['#EBDDFB','#8B5CC9'],o:['#FFE2CC','#EA6A1F']};
+let mlCat='wz',mlSub=0,mlQ='',mlItems=null,mlN=0,mlDrag=null;
+const T2=(pl,en)=>LANG==='en'?en:pl;
+function mlMath(tex,c){const e=mk('math',{tex,size:30,font:'math',x:0,y:0,w:0,h:0});mathInner(e,true);e.x=r1(c.x-e.w/2);e.y=r1(c.y-e.h/2);return e;}
+function mlStack(list,c){
+  const els=list.map(t=>mlMath(t,{x:c.x,y:0})),gap=14,tot=els.reduce((s,e)=>s+e.h,0)+gap*(els.length-1);let y=c.y-tot/2;
+  els.forEach(e=>{e.y=r1(y);y+=e.h+gap;});return els;
+}
+function mlNote(text,col,c,o){const k=NOTE_C[col];return mkUser('note',{x:r1(c.x-130),y:r1(c.y-95),w:260,h:190,text,stroke:k[1],sw:2.5,fill:k[0],font:'hand',size:26,...o});}
+function mlTable(rows,c,cw,rh,o){const w=cw*rows[0].length,h=rh*rows.length;return mk('table',{x:r1(c.x-w/2),y:r1(c.y-h/2),w,h,rows,header:true,size:16,...o});}
+function mlPoly(k,c){const P=POLY[k];return mkUser('poly',{kind:k,x:r1(c.x-P.r[0]/2),y:r1(c.y-P.r[1]/2),w:P.r[0],h:P.r[1],fill:style.fill==='none'?'#FFE2CC':style.fill,stroke:style.stroke===INK?ORG:style.stroke,text:'',vl:false});}
+function mlFunc(exprs,x0,x1,y0,y1,c,w,h){const o={type:'func',exprs,xmin:x0,xmax:x1,x:r1(c.x-w/2),y:r1(c.y-h/2),w,h,size:20};if(y0!=null){o.ymin=y0;o.ymax=y1;}return clean(o);}
+function mlData(){
+  const it=[],eq=(g,gi)=>g[2].forEach(q=>it.push({cat:'wz',sub:gi,names:[q[0],q[1]],tex:q[2],prev:'tex',make:c=>[mlMath(q[2],c)]}));
+  EQG.forEach(eq);
+  const bi=EQG.length,B=(pl,en,list)=>it.push({cat:'wz',sub:bi,names:[pl,en],tex:list[0],prev:'tex',make:c=>mlStack(list,c)});
+  B('Wzory skróconego mnożenia','Algebraic identities',['(a+b)^{2}=a^{2}+2ab+b^{2}','(a-b)^{2}=a^{2}-2ab+b^{2}','a^{2}-b^{2}=(a-b)(a+b)','(a+b)^{3}=a^{3}+3a^{2}b+3ab^{2}+b^{3}','(a-b)^{3}=a^{3}-3a^{2}b+3ab^{2}-b^{3}','a^{3}\\pm b^{3}=(a\\pm b)(a^{2}\\mp ab+b^{2})']);
+  B('Funkcja kwadratowa — ściąga','Quadratic function — summary',['f(x)=ax^{2}+bx+c','\\Delta=b^{2}-4ac','x_{1,2}=\\frac{-b\\pm\\sqrt{\\Delta}}{2a}','p=\\frac{-b}{2a},\\quad q=\\frac{-\\Delta}{4a}','x_{1}+x_{2}=-\\frac{b}{a},\\quad x_{1}x_{2}=\\frac{c}{a}']);
+  B('Trygonometria — podstawy','Trigonometry basics',['\\sin^{2}\\alpha+\\cos^{2}\\alpha=1','\\tan\\alpha=\\frac{\\sin\\alpha}{\\cos\\alpha}','\\sin 2\\alpha=2\\sin\\alpha\\cos\\alpha','\\cos 2\\alpha=\\cos^{2}\\alpha-\\sin^{2}\\alpha','\\sin(\\alpha\\pm\\beta)=\\sin\\alpha\\cos\\beta\\pm\\cos\\alpha\\sin\\beta','\\cos(\\alpha\\pm\\beta)=\\cos\\alpha\\cos\\beta\\mp\\sin\\alpha\\sin\\beta']);
+  B('Pochodne — podstawowe','Basic derivatives',['(c)\'=0','(x^{n})\'=n\\cdot x^{n-1}','(\\sin x)\'=\\cos x','(\\cos x)\'=-\\sin x','(e^{x})\'=e^{x}','(\\ln x)\'=\\frac{1}{x}','(f\\cdot g)\'=f\'g+fg\'']);
+  B('Całki — podstawowe','Basic integrals',['\\int x^{n}\\,dx=\\frac{x^{n+1}}{n+1}+C','\\int \\frac{1}{x}\\,dx=\\ln|x|+C','\\int e^{x}\\,dx=e^{x}+C','\\int \\sin x\\,dx=-\\cos x+C','\\int \\cos x\\,dx=\\sin x+C']);
+  B('Logarytmy — ściąga','Logarithms — summary',['\\log_{a}b=c\\iff a^{c}=b','\\log_{a}(xy)=\\log_{a}x+\\log_{a}y','\\log_{a}\\frac{x}{y}=\\log_{a}x-\\log_{a}y','\\log_{a}x^{n}=n\\log_{a}x','\\log_{a}b=\\frac{\\log_{c}b}{\\log_{c}a}']);
+  B('Pola figur — ściąga','Area formulas',['P_{\\triangle}=\\frac{1}{2}ah','P_{\\square}=a^{2}','P_{\\text{trapez}}=\\frac{(a+b)h}{2}','P_{\\text{romb}}=\\frac{ef}{2}','P_{\\bigcirc}=\\pi r^{2}']);
+  Object.keys(POLY).forEach(k=>it.push({cat:'fig',names:[POLY[k].n,POLY[k].n],prev:'poly',key:k,make:c=>[mlPoly(k,c)]}));
+  [['Funkcja liniowa','Linear function',['2x+1'],-6,6],['Parabola','Parabola',['x^2-2x-3'],-6,6],['Funkcja sześcienna','Cubic function',['x^3-3x'],-4,4],['Pierwiastek','Square root',['sqrt(x)'],-1,9],
+   ['Wartość bezwzględna','Absolute value',['abs(x-2)-1'],-6,6],['Hiperbola','Hyperbola',['1/x'],-6,6],['Funkcje wykładnicze','Exponential functions',['2^x','(1/2)^x'],-4,4],['Logarytm naturalny','Natural logarithm',['ln(x)'],-1,9],
+   ['Sinus','Sine',['sin(x)'],-7,7],['Cosinus','Cosine',['cos(x)'],-7,7],['Sinus i cosinus','Sine and cosine',['sin(x)','cos(x)'],-7,7],['Tangens','Tangent',['tan(x)'],-5,5,-6,6],
+   ['Układ współrzędnych (pusty)','Coordinate system (blank)',[],-6,6],['Układ współrzędnych: I ćwiartka','Coordinate system: quadrant I',[],0,10,0,10]
+  ].forEach(q=>{const sq=!q[1+1].length;it.push({cat:'wyk',names:[q[0],q[1]],prev:'func',exprs:q[2],x0:q[3],x1:q[4],y0:q[5],y1:q[6],make:c=>[sq?mlFunc([],q[3],q[4],q[5],q[6],c,420,420):mlFunc(q[2],q[3],q[4],q[5],q[6],c,440,340)]});});
+  const nums=n=>Array.from({length:n},(_,i)=>i+1);
+  const TB=(pl,en,rows,cw,rh,o)=>it.push({cat:'tab',names:[pl,en],prev:'table',rows,make:c=>[mlTable(rows,c,cw,rh,o)]});
+  TB('Tabliczka mnożenia 10×10','Multiplication table 10×10',[['×',...nums(10)],...nums(10).map(i=>[i,...nums(10).map(j=>i*j)])],46,34);
+  TB('Wartości funkcji trygonometrycznych','Trigonometric values',[['α','0°','30°','45°','60°','90°'],['sin α','0','1/2','√2/2','√3/2','1'],['cos α','1','√3/2','√2/2','1/2','0'],['tg α','0','√3/3','1','√3','—'],['ctg α','—','√3','1','√3/3','0']],84,40);
+  TB('Kwadraty, sześciany, pierwiastki (1–15)','Squares, cubes, roots (1–15)',[['n','n²','n³','√n'],...nums(15).map(n=>[n,n*n,n*n*n,String(Number(Math.sqrt(n).toFixed(3))).replace('.',',')])],90,30);
+  TB('Ułamki, liczby dziesiętne, procenty','Fractions, decimals, percentages',[[T2('Ułamek','Fraction'),T2('Dziesiętnie','Decimal'),T2('Procent','Percent')],['1/2','0,5','50%'],['1/3','0,(3)','33⅓%'],['2/3','0,(6)','66⅔%'],['1/4','0,25','25%'],['3/4','0,75','75%'],['1/5','0,2','20%'],['2/5','0,4','40%'],['3/5','0,6','60%'],['4/5','0,8','80%'],['1/8','0,125','12,5%'],['3/8','0,375','37,5%'],['1/10','0,1','10%'],['1/20','0,05','5%'],['1/100','0,01','1%']],130,30);
+  TB('Jednostki miar — przeliczenia','Units — conversions',[[T2('Wielkość','Quantity'),T2('Przeliczenia','Conversions')],[T2('Długość','Length'),'1 km = 1000 m;  1 m = 100 cm = 1000 mm'],[T2('Masa','Mass'),'1 t = 1000 kg;  1 kg = 1000 g'],[T2('Pole','Area'),'1 ha = 10 000 m²;  1 m² = 10 000 cm²'],[T2('Objętość','Volume'),'1 l = 1000 ml = 1 dm³;  1 m³ = 1000 l'],[T2('Czas','Time'),'1 h = 60 min = 3600 s'],[T2('Prędkość','Speed'),'1 m/s = 3,6 km/h']],260,36);
+  TB('Liczby pierwsze do 100','Primes up to 100',[[2,3,5,7,11],[13,17,19,23,29],[31,37,41,43,47],[53,59,61,67,71],[73,79,83,89,97]],60,40,{header:false});
+  TB('Potęgi liczb 2 i 3','Powers of 2 and 3',[['n','2ⁿ','3ⁿ'],...nums(12).map(n=>[n,Math.pow(2,n),Math.pow(3,n)])],90,30);
+  TB('Liczby rzymskie','Roman numerals',[['I','V','X','L','C','D','M'],['1','5','10','50','100','500','1000']],66,40);
+  SYMS.forEach(s=>it.push({cat:'sym',names:[s,s],prev:'sym',ch:s,make:c=>[mkUser('text',{x:r1(c.x-16),y:r1(c.y-26),text:s,size:44,fill:'none'})]}));
+  const N=(pl,en,col,tpl,ten)=>it.push({cat:'kor',names:[pl,en],prev:'note',col,txt:T2(tpl,ten),make:c=>[mlNote(T2(tpl,ten),col,c)]});
+  N('Zadanie','Problem','y','Zadanie:\n\n','Problem:\n\n');
+  N('Rozwiązanie krok po kroku','Step-by-step solution','g','Krok 1: …\nKrok 2: …\nKrok 3: …\nOdpowiedź: …','Step 1: …\nStep 2: …\nStep 3: …\nAnswer: …');
+  N('Wskazówka','Hint','b','💡 Wskazówka:\n\n','💡 Hint:\n\n');
+  N('Częsty błąd','Common mistake','r','⚠️ Uwaga, częsty błąd:\n\n','⚠️ Watch out, common mistake:\n\n');
+  N('Definicja','Definition','p','Definicja:\n\n','Definition:\n\n');
+  N('Twierdzenie','Theorem','p','Twierdzenie:\n\nDowód: …','Theorem:\n\nProof: …');
+  N('Przykład','Example','o','Przykład:\n\n','Example:\n\n');
+  N('Praca domowa','Homework','y','📌 Praca domowa:\n1. \n2. \n3. ','📌 Homework:\n1. \n2. \n3. ');
+  N('Podsumowanie lekcji','Lesson summary','g','✅ Dziś nauczyliśmy się:\n• \n• \n• ','✅ Today we learned:\n• \n• \n• ');
+  TB('Karta zadań z punktacją','Problem sheet with scoring',[[T2('Nr','No.'),T2('Zadanie','Problem'),T2('Punkty','Points'),T2('Uwagi','Notes')],['1','','',''],['2','','',''],['3','','',''],['4','','',''],['','',T2('Suma:','Total:'),'']],120,44);
+  TB('Dziennik lekcji','Lesson log',[[T2('Data','Date'),T2('Temat','Topic'),T2('Praca domowa','Homework'),T2('Ocena','Grade')],['','','',''],['','','',''],['','','',''],['','','','']],130,44);
+  it.push({cat:'kor',names:['Plan lekcji (4 etapy)','Lesson plan (4 stages)'],prev:'note',col:'b',txt:T2('1 Powtórka → 2 Nowy temat → 3 Ćwiczenia → 4 Podsumowanie','1 Review → 2 New topic → 3 Practice → 4 Summary'),make:c=>{
+    const S=[['y','1. Powtórka (5 min)\n\n','1. Review (5 min)\n\n'],['b','2. Nowy temat (15 min)\n\n','2. New topic (15 min)\n\n'],['g','3. Ćwiczenia (20 min)\n\n','3. Practice (20 min)\n\n'],['o','4. Podsumowanie i praca domowa\n\n','4. Summary and homework\n\n']];
+    return S.map((s,i)=>mlNote(T2(s[1],s[2]),s[0],{x:c.x+(i-1.5)*280,y:c.y},{w:260,h:210}));}});
+  return it;
+}
+function mlPrev(it){
+  try{
+    if(it.prev==='tex'){const t={x:0,y:0,tex:it.tex,size:30,stroke:INK},g=mathInner(t,true);return`<svg viewBox="0 0 ${r1(t.w)} ${r1(t.h)}">${g}</svg>`;}
+    if(it.prev==='poly'){const P=POLY[it.key];let s;
+      if(P.solid)s=solidSVG({x:3,y:3,w:18,h:18,kind:it.key,sw:1.4,stroke:ORG,size:20,text:''},'#FFE2CC',`stroke="${ORG}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"`,'',true);
+      else s=`<polygon points="${P.p.map(q=>`${r1(3+q[0]*18)},${r1(3+q[1]*18)}`).join(' ')}" fill="#FFE2CC" stroke="${ORG}" stroke-width="1.6" stroke-linejoin="round"/>${P.ra?`<path d="M3 21V18H6" fill="none" stroke="${ORG}" stroke-width="1.2"/>`:''}`;
+      return`<svg viewBox="0 0 24 24" style="width:64px;height:64px">${s}</svg>`;}
+    if(it.prev==='func'){const e=mlFunc(it.exprs,it.x0,it.x1,it.y0,it.y1,{x:150,y:100},300,200);if(!e)return'';e.id='mlp';e.x=0;e.y=0;e.size=16;return`<svg viewBox="0 0 300 200">${funcSVG(e,'')}</svg>`;}
+    if(it.prev==='table'){const r=it.rows.slice(0,4).map(q=>q.slice(0,5).map(String)),e=mk('table',{x:0,y:0,w:300,h:30*r.length,rows:r,header:it.rows===null?false:true,size:14});return`<svg viewBox="0 0 300 ${30*r.length}">${tableSVG(e,'')}</svg>`;}
+    if(it.prev==='note'){const k=NOTE_C[it.col];return`<div class="mlnote" style="background:${k[0]};border-color:${k[1]}">${esc(it.txt)}</div>`;}
+    if(it.prev==='sym')return esc(it.ch);
+  }catch(err){}
+  return'';
+}
+function mlBuild(){
+  if(!mlItems)mlItems=mlData();else mlItems=mlData(); // odśwież (język)
+  const L=a=>LANG==='en'?a[2]:a[1];
+  $('#mlCats').innerHTML=ML_CATS.map(c=>`<button data-c="${c[0]}" class="${!mlQ&&c[0]===mlCat?'on':''}">${esc(L(c))}</button>`).join('');
+  const sub=$('#mlSub');
+  if(!mlQ&&mlCat==='wz'){sub.style.display='flex';sub.innerHTML=[...EQG.map(g=>LANG==='en'?g[1]:g[0]),T2('Zestawy (kilka wzorów naraz)','Sets (several formulas at once)')].map((n,i)=>`<button data-s="${i}" class="${i===mlSub?'on':''}">${esc(n)}</button>`).join('');}
+  else{sub.style.display='none';sub.innerHTML='';}
+  const q=mlQ.trim().toLowerCase();
+  let list=q?mlItems.filter(i=>i.names.join(' ').toLowerCase().includes(q)||(i.tex||'').toLowerCase().includes(q)).slice(0,80):mlItems.filter(i=>i.cat===mlCat&&(mlCat!=='wz'||i.sub===mlSub));
+  mlGrid.classList.toggle('sym',!q&&mlCat==='sym');
+  mlGrid.innerHTML=list.length?list.map(i=>{const idx=mlItems.indexOf(i);return i.prev==='sym'&&!q?`<div class="mlcard" data-li="${idx}" title="${esc(i.ch)}" data-notr>${esc(i.ch)}</div>`:`<div class="mlcard" data-li="${idx}" title="${esc(LANG==='en'?i.names[1]:i.names[0])}"><div class="mlprev" data-notr>${mlPrev(i)}</div><div class="mlname" data-notr>${esc(LANG==='en'?i.names[1]:i.names[0])}</div></div>`;}).join(''):`<div class="mlempty">${esc(T2('Nic nie znaleziono.','Nothing found.'))}</div>`;
+}
+function mlInsert(it,c){
+  commitEdit();const els=it.make(c).filter(Boolean);if(!els.length)return;
+  board().els.push(...els);setTool('select');sel=new Set(els.map(e=>e.id));render();commit();
+}
+function toggleMathLib(force){
+  const on=force==null?!mlEl.classList.contains('open'):force;
+  mlEl.classList.toggle('open',on);
+  if(on){mlBuild();if(!matchMedia('(pointer:coarse)').matches&&innerWidth>700)setTimeout(()=>$('#mlSearch').focus(),30);}
+}
+$('#mathBtn').onclick=()=>toggleMathLib();
+$('#mlClose').onclick=()=>toggleMathLib(false);
+$('#mlSearch').addEventListener('input',e=>{mlQ=e.target.value;mlBuild();});
+$('#mlSearch').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape')toggleMathLib(false);});
+$('#mlCats').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;mlCat=b.dataset.c;mlSub=0;mlQ='';$('#mlSearch').value='';mlBuild();});
+$('#mlSub').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;mlSub=+b.dataset.s;mlBuild();});
+mlGrid.addEventListener('pointerdown',e=>{
+  const c=e.target.closest('[data-li]');if(!c||e.button>0)return;
+  mlDrag={i:+c.dataset.li,x:e.clientX,y:e.clientY,moved:false,ghost:null,pid:e.pointerId,touch:e.pointerType==='touch'};
+});
+document.addEventListener('pointermove',e=>{
+  const d=mlDrag;if(!d||e.pointerId!==d.pid||d.touch)return;
+  if(!d.moved&&Math.hypot(e.clientX-d.x,e.clientY-d.y)>8){
+    d.moved=true;const it=mlItems[d.i],g=document.createElement('div');g.className='mlghost';g.textContent=LANG==='en'?it.names[1]:it.names[0];document.body.appendChild(g);d.ghost=g;
+  }
+  if(d.ghost){d.ghost.style.left=e.clientX+'px';d.ghost.style.top=e.clientY+'px';}
+});
+const mlEnd=e=>{
+  const d=mlDrag;if(!d||(e.pointerId!==undefined&&e.pointerId!==d.pid))return;mlDrag=null;
+  if(d.ghost)d.ghost.remove();
+  const it=mlItems[d.i];if(!it)return;
+  if(e.type==='pointercancel')return;
+  if(!d.moved){const vc=viewCenter(),o=(mlN++%6)*26-52;mlInsert(it,{x:vc.x+o,y:vc.y+o});toast(tf('Wstawiono na tablicę: {0}',LANG==='en'?it.names[1]:it.names[0]));return;}
+  const t=document.elementFromPoint(e.clientX,e.clientY);
+  if(t&&t.closest('#stage')&&!t.closest('.panel'))mlInsert(it,toWorld({clientX:e.clientX,clientY:e.clientY}));
+};
+document.addEventListener('pointerup',mlEnd);document.addEventListener('pointercancel',mlEnd);
+document.addEventListener('keydown',e=>{
+  if(e.key.toLowerCase()!=='m'||e.ctrlKey||e.metaKey||e.altKey||editing)return;
+  const tg=e.target;if(tg&&(tg.closest&&tg.closest('input,textarea,[contenteditable],dialog')))return;
+  e.preventDefault();toggleMathLib();
+});function mathPrev(){
   const t={x:0,y:0,tex:$('#mTex').value,size:34,stroke:INK},g=mathInner(t,true),k=Math.min(1,560/t.w);
   $('#mPrev').innerHTML=`<svg viewBox="0 0 ${t.w} ${t.h}" width="${Math.round(t.w*k)}" height="${Math.round(t.h*k)}">${g}</svg>`;
 }
@@ -3802,7 +3964,7 @@ function setLang(l){
   document.title=tr('Work Docs — tablica do nauki');
   $$('#langBtn .lg').forEach(s=>s.classList.toggle('on',s.dataset.l===LANG));
   trMO.disconnect();trTree(document.body);trMO.observe(document.body,trOpts);
-  buildEqSelect();renderTabs();updateAICtx();updateProps();
+  buildEqSelect();renderTabs();updateAICtx();updateProps();mlBuild();
   if(calcEl.classList.contains('open'))calcPreview();
 }
 $('#langBtn').onclick=()=>setLang(LANG==='pl'?'en':'pl');
