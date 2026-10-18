@@ -3,11 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>Work Docs — tablica do nauki</title>
-<meta name="description" content="Work Docs: tablica do nauki, schematów i notatek. Rysuj, twórz diagramy, drukuj i pobieraj.">
+<title>Work Docs — tablica do nauki i korepetycji</title>
+<meta name="description" content="Tablica online do nauki, szczególnie dla korepetytorów: wiele funkcji matematycznych (wzory, wykresy, figury, kalkulator), udostępniane tablice i współpraca na żywo.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Work Docs">
+<meta property="og:title" content="Work Docs — tablica do nauki i korepetycji">
+<meta property="og:description" content="Szczególnie dla korepetytorów: wiele funkcji matematycznych (wzory, wykresy, figury, kalkulator), udostępniane tablice i współpraca na żywo.">
+<meta property="og:image" content="https://www.workdocs.online/icon-512.png">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Work Docs","alternateName":"WorkDocs","url":"https://www.workdocs.online/"}</script>
 <meta name="theme-color" content="#FBF4EA">
-<link rel="icon" href="logo.webp" type="image/webp">
-<link rel="apple-touch-icon" href="logo.webp">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -253,6 +263,21 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
 #calc.open{display:flex}
 #mathLib{display:none;left:72px;top:64px;bottom:70px;width:376px;flex-direction:column;z-index:14;overflow:hidden;gap:0}
 #mathLib.open{display:flex}
+.mllock{display:none;align-items:center;gap:10px;margin:2px 14px 6px;padding:9px 10px;border-radius:12px;background:linear-gradient(135deg,#FFF1E4,#FFE2CC);border:1px solid #F3C7A5;flex:none}
+.mllock.on{display:flex}
+.mllock .mlli{font-size:20px}
+.mllock div{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.mllock b{font-size:13px}
+.mllock small{font-size:11.5px;color:var(--muted)}
+.mllock .btn{height:32px;font-size:12.5px;padding:0 12px;flex:none}
+.mlcard.locked{position:relative;opacity:.55;cursor:pointer}
+.mlcard.locked::after{content:"🔒";position:absolute;right:6px;top:4px;font-size:13px}
+#mlGrid.sym .mlcard.locked::after{display:none}
+#mathBtn{position:relative}
+#mathBtn.locked::after{content:"🔒";position:absolute;right:-3px;top:-4px;font-size:11px;line-height:1}
+#premDlg{max-width:440px}
+.premlist{margin:0 0 6px;padding-left:20px;font-size:13.5px;line-height:1.5}
+.premnote{font-size:12.5px;color:var(--muted);background:var(--accent-soft);border-radius:10px;padding:8px 10px}
 .mlh{display:flex;align-items:center;gap:8px;padding:12px 14px 4px}
 #mlSearch{margin:4px 14px 6px;width:auto;flex:none}
 .mlcats{display:flex;gap:6px;overflow-x:auto;padding:2px 14px 8px;flex:none;scrollbar-width:thin}
@@ -574,6 +599,7 @@ sin(x)</textarea>
 
   <section id="mathLib" class="panel" aria-label="Biblioteka matematyczna">
     <div class="mlh"><span class="aibadge"><i data-i="sigma"></i>Matematyka</span><span class="grow"></span><button class="aix" id="mlClose" title="Zamknij" aria-label="Zamknij">×</button></div>
+    <div id="mlLock" class="mllock"><span class="mlli">🔒</span><div><b>Funkcja Premium</b><small>Biblioteka matematyczna jest dostępna w planie Premium (10 zł).</small></div><button class="btn primary" id="mlBuy">Zdobądź Premium</button></div>
     <input id="mlSearch" class="dfield" type="text" autocomplete="off" spellcheck="false" placeholder="Szukaj wzoru, figury, tabeli…">
     <div class="mlcats" id="mlCats"></div>
     <div class="mlcats mlsub" id="mlSub"></div>
@@ -637,6 +663,17 @@ sin(x)</textarea>
   <div class="row"><button class="btn" id="dCancel" style="margin-right:8px">Anuluj</button><button class="btn primary" id="dOk">Zapisz</button></div>
 </dialog>
 
+<dialog id="premDlg">
+  <h3>Zdobądź Premium 🔒</h3>
+  <p class="hint" style="margin:0 0 10px">Odblokuj biblioteki i funkcje dla uczniów i korepetytorów — jednorazowo, <b id="premPrice">10 zł</b>.</p>
+  <ul class="premlist">
+    <li><b>Biblioteka matematyczna</b> — ponad 100 wzorów, figury i bryły, wykresy, tabele, szablony dla korepetytora (kliknij lub przeciągnij na tablicę)</li>
+    <li>Kolejne funkcje Premium — w przygotowaniu</li>
+  </ul>
+  <div class="premnote" id="premNote">Płatność przelewem (Przelewy24) uruchomimy wkrótce. Premium zostanie przypisane do Twojego konta.</div>
+  <div class="row" style="margin-top:14px"><button class="btn" id="premLater">Może później</button><button class="btn primary" id="premBuy">Zdobądź Premium — 10 zł</button></div>
+</dialog>
+
 <dialog id="cloudDlg">
   <h3 id="cloudTitle">Konto i chmura</h3>
   <div id="authView">
@@ -645,8 +682,8 @@ sin(x)</textarea>
     <input id="aPass" class="dfield" type="password" autocomplete="current-password" placeholder="Hasło (min. 6 znaków)">
     <input id="aCode" class="dfield" type="text" autocomplete="off" placeholder="Kod rejestracji" style="display:none">
     <div id="authMsg" class="authmsg"></div>
-    <div class="row" style="margin-top:6px"><button class="btn primary" id="authGo">Zaloguj się</button></div>
-    <p class="hint">E-maila nie trzeba potwierdzać. Po zalogowaniu Twoje tablice zapisują się w chmurze i możesz je udostępniać innym.</p>
+    <div class="row" style="margin-top:6px"><button class="btn primary" id="authGo">Zaloguj się</button><button class="btn" id="authResend" style="display:none">Wyślij e-mail ponownie</button></div>
+    <p class="hint">Po założeniu konta wyślemy link potwierdzający na Twój e-mail. Po zalogowaniu Twoje tablice zapisują się w chmurze i możesz je udostępniać innym.</p>
   </div>
   <div id="listView" style="display:none">
     <div class="whoami"><span>Zalogowano jako <b id="whoEmail"></b></span><button class="btn" id="logoutBtn">Wyloguj</button></div>
@@ -2592,6 +2629,50 @@ function buildEqSelect(){
 buildEqSelect();
 /* ---------- biblioteka matematyczna (uczniowie i korepetytorzy): kliknij kartę albo przeciągnij ją na tablicę ---------- */
 const mlEl=$('#mathLib'),mlGrid=$('#mlGrid');
+/* Premium: do czasu kont i płatności blokada jest po stronie interfejsu. Prawdziwe sprawdzenie (serwer) opisano w PREMIUM_I_SERWER.md. */
+const isPremium=()=>{try{const c=window.WORKDOCS_CONFIG||{};return !!(c.premiumAll||(typeof cloud!=='undefined'&&cloud&&cloud.premium===true));}catch(e){return false;}};
+const PREMIUM_PRICE='10 zł';
+function mlLockUI(){const on=!isPremium();$('#mlLock').classList.toggle('on',on);$('#mathBtn').classList.toggle('locked',on);}
+function showPremium(){mlLockUI();$('#premDlg').showModal();}
+let premReturn=new URLSearchParams(location.search).get('premium')==='return';
+if(premReturn)try{history.replaceState(null,'',location.pathname);}catch(e){}
+const premNote=t=>{$('#premNote').textContent=tr(t);};
+async function refreshPremium(announce){
+  const was=cloud.premium===true;
+  if(!cloud.sb||!cloud.user)cloud.premium=false;
+  else{
+    try{const{data,error}=await cloud.sb.from('premium_workdocs').select('user_id').eq('user_id',cloud.user.id);cloud.premium=!error&&Array.isArray(data)&&data.length>0;}catch(e){/* zostaje poprzedni stan */}
+  }
+  mlLockUI();if(mlEl.classList.contains('open'))mlBuild();
+  if(!was&&cloud.premium&&announce)toast('Premium aktywne — dziękujemy! 🎉');
+  return cloud.premium===true;
+}
+async function watchPremium(){ // po powrocie z Przelewy24 czekamy, aż bank potwierdzi płatność
+  premNote('Sprawdzam płatność…');if(!$('#premDlg').open)$('#premDlg').showModal();
+  for(let i=0;i<20;i++){
+    if(await refreshPremium(true)){$('#premDlg').close();return;}
+    await new Promise(r=>setTimeout(r,3000));
+  }
+  premNote('Płatność w toku — Premium włączy się automatycznie, gdy bank potwierdzi (zwykle do minuty). Odśwież stronę za chwilę.');
+}
+async function startCheckout(){
+  const c=window.WORKDOCS_CONFIG||{};
+  if(c.checkoutUrl){location.href=c.checkoutUrl;return;} // opcjonalnie: gotowy link płatności
+  if(!cloud.sb){premNote('Płatności uruchomimy wkrótce — dziękujemy za zainteresowanie! Premium zostanie przypisane do Twojego konta.');return;}
+  if(!cloud.user){$('#premDlg').close();openCloud('Zaloguj się lub załóż konto, aby kupić Premium.');return;}
+  const btn=$('#premBuy');btn.disabled=true;premNote('Łączę z Przelewy24…');
+  try{
+    const{data}=await cloud.sb.auth.getSession(),tok=data&&data.session&&data.session.access_token;
+    const r=await fetch('/api/p24_create',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+(tok||'')},body:'{}'});
+    const j=await r.json().catch(()=>({}));
+    if(j.already){await refreshPremium(true);$('#premDlg').close();return;}
+    if(j.url){location.href=j.url;return;}
+    if(r.status===501||r.status===404||j.error==='not_configured')premNote('Płatności uruchomimy wkrótce — dziękujemy za zainteresowanie! Premium zostanie przypisane do Twojego konta.');
+    else{$('#premNote').textContent=j.error||tr('Nie udało się rozpocząć płatności.');}
+  }catch(e){premNote('Nie udało się rozpocząć płatności.');}
+  finally{btn.disabled=false;}
+}
+$('#premBuy').onclick=startCheckout;$('#premLater').onclick=()=>$('#premDlg').close();$('#mlBuy').onclick=showPremium;
 const ML_CATS=[['wz','Wzory','Formulas'],['fig','Figury i bryły','Shapes & solids'],['wyk','Wykresy','Graphs'],['tab','Tabele i ściągi','Tables & cheat sheets'],['sym','Symbole','Symbols'],['kor','Dla korepetytora','For tutors']];
 const NOTE_C={y:['#FFF0B8','#C98A0B'],g:['#D9F0DD','#3F9B5F'],b:['#D6E6FF','#3A6FD8'],r:['#FBD9D5','#D93B2B'],p:['#EBDDFB','#8B5CC9'],o:['#FFE2CC','#EA6A1F']};
 let mlCat='wz',mlSub=0,mlQ='',mlItems=null,mlN=0,mlDrag=null;
@@ -2665,7 +2746,7 @@ function mlPrev(it){
   return'';
 }
 function mlBuild(){
-  if(!mlItems)mlItems=mlData();else mlItems=mlData(); // odśwież (język)
+  mlItems=mlData(); mlLockUI(); // odśwież (język, stan Premium)
   const L=a=>LANG==='en'?a[2]:a[1];
   $('#mlCats').innerHTML=ML_CATS.map(c=>`<button data-c="${c[0]}" class="${!mlQ&&c[0]===mlCat?'on':''}">${esc(L(c))}</button>`).join('');
   const sub=$('#mlSub');
@@ -2674,9 +2755,10 @@ function mlBuild(){
   const q=mlQ.trim().toLowerCase();
   let list=q?mlItems.filter(i=>i.names.join(' ').toLowerCase().includes(q)||(i.tex||'').toLowerCase().includes(q)).slice(0,80):mlItems.filter(i=>i.cat===mlCat&&(mlCat!=='wz'||i.sub===mlSub));
   mlGrid.classList.toggle('sym',!q&&mlCat==='sym');
-  mlGrid.innerHTML=list.length?list.map(i=>{const idx=mlItems.indexOf(i);return i.prev==='sym'&&!q?`<div class="mlcard" data-li="${idx}" title="${esc(i.ch)}" data-notr>${esc(i.ch)}</div>`:`<div class="mlcard" data-li="${idx}" title="${esc(LANG==='en'?i.names[1]:i.names[0])}"><div class="mlprev" data-notr>${mlPrev(i)}</div><div class="mlname" data-notr>${esc(LANG==='en'?i.names[1]:i.names[0])}</div></div>`;}).join(''):`<div class="mlempty">${esc(T2('Nic nie znaleziono.','Nothing found.'))}</div>`;
+  mlGrid.innerHTML=list.length?list.map(i=>{const idx=mlItems.indexOf(i);return i.prev==='sym'&&!q?`<div class="mlcard${isPremium()?'':' locked'}" data-li="${idx}" title="${esc(i.ch)}" data-notr>${esc(i.ch)}</div>`:`<div class="mlcard${isPremium()?'':' locked'}" data-li="${idx}" title="${esc(LANG==='en'?i.names[1]:i.names[0])}"><div class="mlprev" data-notr>${mlPrev(i)}</div><div class="mlname" data-notr>${esc(LANG==='en'?i.names[1]:i.names[0])}</div></div>`;}).join(''):`<div class="mlempty">${esc(T2('Nic nie znaleziono.','Nothing found.'))}</div>`;
 }
 function mlInsert(it,c){
+  if(!isPremium()){showPremium();return;}
   commitEdit();const els=it.make(c).filter(Boolean);if(!els.length)return;
   board().els.push(...els);setTool('select');sel=new Set(els.map(e=>e.id));render();commit();
 }
@@ -2693,6 +2775,7 @@ $('#mlCats').addEventListener('click',e=>{const b=e.target.closest('[data-c]');i
 $('#mlSub').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;mlSub=+b.dataset.s;mlBuild();});
 mlGrid.addEventListener('pointerdown',e=>{
   const c=e.target.closest('[data-li]');if(!c||e.button>0)return;
+  if(!isPremium()){showPremium();return;} // zablokowane: kłódka, brak wstawiania i przeciągania
   mlDrag={i:+c.dataset.li,x:e.clientX,y:e.clientY,moved:false,ghost:null,pid:e.pointerId,touch:e.pointerType==='touch'};
 });
 document.addEventListener('pointermove',e=>{
@@ -3333,12 +3416,14 @@ function updateAccUI(){
 }
 async function cloudSignedIn(){
   cloud.status='saved';renderTabs();
+  if(premReturn){premReturn=false;watchPremium();}else refreshPremium(false);
   if($('#cloudDlg').open)renderCloudDlg();
   await openFromUrl();
   const b=board();
   if(b.cloud){const rt=RT.get(b.cloud.id);if(!rt||!rt.dbChan)cloudStart(b,{fetch:true});}
 }
 function cloudSignedOut(){
+  cloud.premium=false;mlLockUI();
   for(const b of state.boards)cloudDetach(b);
   if(state.boards.some(b=>b.cloud)){
     state.boards=state.boards.filter(b=>!b.cloud);
@@ -3469,8 +3554,15 @@ function onLiveEl(rt,pl){
     const el=clean(raw);if(!el)continue;el.id=raw.id;
     const i=b.els.findIndex(e=>e.id===el.id);
     if(i>=0){b.els[i]=el;if(rt.synced.has(el.id))rt.synced.set(el.id,JSON.stringify(el));remoteChanged(rt,b,false,el.id);}
-    else{b.els.push(el);rt.remoteLive.add(el.id);remoteChanged(rt,b,true);}
+    else{b.els.push(el);rt.remoteLive.add(el.id);remoteChanged(rt,b,true);const lid=el.id;setTimeout(()=>{if(rt.remoteLive.has(lid)&&!rt.synced.has(lid))adoptLive(rt);},20000);}
   }
+}
+/* Elementy dodane przez drugą osobę "na żywo", których nie zdążyła zapisać do bazy (np. wyszła z tablicy),
+   przejmujemy — inaczej nikt by ich nie zapisał, a nasze zmiany w nich ginęłyby po odświeżeniu. */
+function adoptLive(rt){
+  if(!rt.remoteLive.size)return;
+  const b=boardOf(rt);rt.remoteLive.clear();
+  if(b&&b.cloud&&b.cloud.role!=='view'&&cloud.user){rt.dirty=true;clearTimeout(rt.saveT);rt.saveT=setTimeout(()=>cloudPush(b),300);}
 }
 function remoteChanged(rt,b,full,id){
   if(full)rt.needFull=true;else if(id)rt.dirtyIds.add(id);
@@ -3619,6 +3711,7 @@ function onPresence(rt){
   if(gone)renderPeerSel();
   if(following&&!seen.has(following.email)&&boardOf(rt)===board())stopFollow(false,true);
   if(others>0&&!rt.hadPeers){rt.lastSel='';selHook();sendView(true);} // ktoś dołączył — wyślij mu moje zaznaczenie i widok
+  if(!others&&rt.hadPeers){clearTimeout(rt.adoptT);rt.adoptT=setTimeout(()=>{if(!rt.peerCount)adoptLive(rt);},4000);} // ktoś wyszedł — po chwili przejmujemy jego niezapisane elementy
   rt.hadPeers=others>0;
 }
 function renderPeers(list){
@@ -3741,6 +3834,9 @@ document.addEventListener('visibilitychange',()=>{
   const b=board();if(!b.cloud)return;const rt=RT.get(b.cloud.id);
   if(rt&&rt.dirty){clearTimeout(rt.saveT);cloudPush(b);}
 });
+addEventListener('beforeunload',e=>{ // nie gub niezapisanych zmian przy szybkim zamknięciu karty
+  for(const b of state.boards){const rt=b.cloud&&RT.get(b.cloud.id);if(rt&&(rt.dirty||rt.pushing)&&b.cloud.role!=='view'){try{cloudPush(b);}catch(x){}e.preventDefault();e.returnValue='';return'';}}
+});
 addEventListener('online',()=>{const b=board();if(b.cloud){setStatus('saving');const rt=RT.get(b.cloud.id);if(rt)rt.dirty=true;cloudPush(b);}});
 addEventListener('offline',()=>{if(board().cloud)setStatus('offline');});
 
@@ -3761,7 +3857,7 @@ function setAuthMode(m){
   authMode=m;$$('#authTabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   $('#authGo').textContent=m==='login'?'Zaloguj się':'Utwórz konto';
   $('#aPass').autocomplete=m==='login'?'current-password':'new-password';
-  $('#authMsg').textContent='';$('#authMsg').className='authmsg';
+  $('#authMsg').textContent='';$('#authMsg').className='authmsg';$('#authResend').style.display='none';
   if(m==='login')$('#aCode').style.display='none';
 }
 function authMsg(t,ok){$('#authMsg').textContent=t;$('#authMsg').className='authmsg'+(ok?' ok':'');}
@@ -3771,20 +3867,22 @@ async function authGo(){
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return authMsg('Podaj poprawny adres e-mail.');
   if(pass.length<6)return authMsg('Hasło musi mieć co najmniej 6 znaków.');
   authBusy=true;$('#authGo').disabled=true;authMsg('');
-  const login=async()=>{const{error}=await cloud.sb.auth.signInWithPassword({email,password:pass});if(error)authMsg(authErr(error.message));else{$('#aPass').value='';}};
+  $('#authResend').style.display='none';
+  const login=async()=>{const{error}=await cloud.sb.auth.signInWithPassword({email,password:pass});if(error){authMsg(authErr(error.message));if(/not confirmed/i.test(error.message))$('#authResend').style.display='inline-flex';}else{$('#aPass').value='';}};
   try{
     if(authMode==='login')await login();
     else{
-      let created=false,stop=false;
+      let created=false,stop=false,pending=false;
       try{
         const r=await fetch('/api/register_workdocs',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,password:pass,code:$('#aCode').value.trim()})});
         const j=await r.json().catch(()=>({}));
-        if(r.ok)created=true;
+        if(r.ok){created=true;if(j.confirmed===false)pending=true;}
         else if(j.needCode){$('#aCode').style.display='block';authMsg(j.error||'Podaj kod rejestracji.');stop=true;}
         else if(r.status===409||r.status===400||r.status===403||r.status===429){authMsg(j.error||'Nie udało się utworzyć konta.');stop=true;}
       }catch(e){/* brak endpointu — spróbujemy zwykłej rejestracji */}
       if(!stop){
-        if(created)await login();
+        if(pending){authMsg('Wysłaliśmy e-mail z linkiem potwierdzającym. Kliknij go, a potem zaloguj się tutaj.',true);$('#authResend').style.display='inline-flex';}
+        else if(created)await login();
         else{
           const{data,error}=await cloud.sb.auth.signUp({email,password:pass});
           if(error)authMsg(authErr(error.message));
@@ -3796,6 +3894,19 @@ async function authGo(){
 }
 $('#authTabs').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)setAuthMode(b.dataset.m);});
 $('#authGo').onclick=authGo;
+$('#authResend').onclick=async()=>{
+  const email=$('#aEmail').value.trim().toLowerCase(),pass=$('#aPass').value;
+  if(!email||pass.length<6)return authMsg('Wpisz e-mail i hasło, aby wysłać link ponownie.');
+  authBusy=true;$('#authResend').disabled=true;
+  try{
+    const r=await fetch('/api/register_workdocs',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'resend',email,password:pass})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&j.confirmed){$('#authResend').style.display='none';authBusy=false;const{error}=await cloud.sb.auth.signInWithPassword({email,password:pass});if(error)authMsg(authErr(error.message));else{$('#aPass').value='';}}
+    else if(r.ok&&j.resent)authMsg('Wysłaliśmy link ponownie — sprawdź skrzynkę (także spam).',true);
+    else authMsg(j.error||'Nie udało się wysłać linku.');
+  }catch(e){authMsg('Nie udało się połączyć z serwerem kont.');}
+  finally{authBusy=false;$('#authResend').disabled=false;}
+};
 $('#aPass').addEventListener('keydown',e=>{if(e.key==='Enter')authGo();});
 $('#aEmail').addEventListener('keydown',e=>{if(e.key==='Enter')$('#aPass').focus();});
 $('#logoutBtn').onclick=async()=>{$('#cloudDlg').close();if(cloud.sb)await cloud.sb.auth.signOut();toast('Wylogowano');};
@@ -3961,7 +4072,7 @@ function setLang(l){
   LANG=l==='en'?'en':'pl';
   try{localStorage.setItem('workdocs.lang',LANG);}catch(e){}
   document.documentElement.lang=LANG;
-  document.title=tr('Work Docs — tablica do nauki');
+  document.title=tr('Work Docs — tablica do nauki i korepetycji');
   $$('#langBtn .lg').forEach(s=>s.classList.toggle('on',s.dataset.l===LANG));
   trMO.disconnect();trTree(document.body);trMO.observe(document.body,trOpts);
   buildEqSelect();renderTabs();updateAICtx();updateProps();mlBuild();

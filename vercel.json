@@ -1,5 +1,8 @@
 {
   "functions": {
-    "api/ai.js": { "maxDuration": 60 }
+    "api/ai.js": { "maxDuration": 60 },
+    "api/register_workdocs.js": { "maxDuration": 30 },
+    "api/p24_create.js": { "maxDuration": 30 },
+    "api/p24_notify.js": { "maxDuration": 30 }
   }
 }

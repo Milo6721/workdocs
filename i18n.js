@@ -306,5 +306,30 @@ window.WORKDOCS_EN = {
   'Wzory, figury, bryły, wykresy, tabele, szablony dla korepetytora': 'Formulas, shapes, solids, graphs, tables, templates for tutors',
   'Szukaj wzoru, figury, tabeli…': 'Search formulas, shapes, tables…',
   'Kliknij kartę, aby wstawić ją na tablicę, albo przeciągnij ją na wybrane miejsce.': 'Click a card to insert it on the board, or drag it to a chosen spot.',
-  'Wstawiono na tablicę: {0}': 'Inserted on the board: {0}'
+  'Wstawiono na tablicę: {0}': 'Inserted on the board: {0}',
+  // --- Premium ---
+  'Zdobądź Premium': 'Get Premium', 'Zdobądź Premium 🔒': 'Get Premium 🔒', 'Zdobądź Premium — 10 zł': 'Get Premium — 10 PLN', 'Może później': 'Maybe later', 'Funkcja Premium': 'Premium feature',
+  'Biblioteka matematyczna jest dostępna w planie Premium (10 zł).': 'The math library is part of the Premium plan (10 PLN).',
+  'Odblokuj biblioteki i funkcje dla uczniów i korepetytorów — jednorazowo,': 'Unlock libraries and features for students and tutors — one-time,',
+  'Biblioteka matematyczna': 'Math library',
+  ' — ponad 100 wzorów, figury i bryły, wykresy, tabele, szablony dla korepetytora (kliknij lub przeciągnij na tablicę)': ' — 100+ formulas, shapes and solids, graphs, tables, tutor templates (click or drag onto the board)',
+  'Kolejne funkcje Premium — w przygotowaniu': 'More Premium features — coming soon',
+  'Płatność przelewem (Przelewy24) uruchomimy wkrótce. Premium zostanie przypisane do Twojego konta.': 'Payment by bank transfer (Przelewy24) is coming soon. Premium will be linked to your account.',
+  'Płatności uruchomimy wkrótce — dziękujemy za zainteresowanie! Premium zostanie przypisane do Twojego konta.': 'Payments are coming soon — thanks for your interest! Premium will be linked to your account.',
+  'Płatności uruchomimy wkrótce': 'Payments are coming soon',
+  'Work Docs — tablica do nauki i korepetycji': 'Work Docs — whiteboard for learning and tutoring',
+  // --- konta: potwierdzenie e-maila; płatności ---
+  'Wyślij e-mail ponownie': 'Resend email',
+  'Po założeniu konta wyślemy link potwierdzający na Twój e-mail. Po zalogowaniu Twoje tablice zapisują się w chmurze i możesz je udostępniać innym.': 'After you sign up we will email you a confirmation link. Once signed in, your boards are saved in the cloud and you can share them with others.',
+  'Wysłaliśmy e-mail z linkiem potwierdzającym. Kliknij go, a potem zaloguj się tutaj.': 'We sent an email with a confirmation link. Click it, then sign in here.',
+  'Wysłaliśmy link ponownie — sprawdź skrzynkę (także spam).': 'We sent the link again — check your inbox (and spam).',
+  'Wpisz e-mail i hasło, aby wysłać link ponownie.': 'Enter your email and password to resend the link.',
+  'Nie udało się wysłać linku.': 'Could not send the link.',
+  'Nie udało się połączyć z serwerem kont.': 'Could not reach the account server.',
+  'Zaloguj się lub załóż konto, aby kupić Premium.': 'Sign in or create an account to buy Premium.',
+  'Łączę z Przelewy24…': 'Connecting to Przelewy24…',
+  'Nie udało się rozpocząć płatności.': 'Could not start the payment.',
+  'Premium aktywne — dziękujemy! 🎉': 'Premium is active — thank you! 🎉',
+  'Sprawdzam płatność…': 'Checking your payment…',
+  'Płatność w toku — Premium włączy się automatycznie, gdy bank potwierdzi (zwykle do minuty). Odśwież stronę za chwilę.': 'Payment in progress — Premium will turn on automatically once the bank confirms (usually within a minute). Refresh the page shortly.'
 };

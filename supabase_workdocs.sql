@@ -216,3 +216,37 @@ create policy "realtime_write_presence_workdocs" on realtime.messages
              then public.can_view_workdocs(substring(realtime.topic() from 7 for 36)::uuid)
              else false end
   );
+
+-- =====================================================================
+-- PREMIUM I PŁATNOŚCI (Przelewy24)  — uruchom w Supabase → SQL Editor (bezpieczne do powtórzenia)
+-- Zapis do tych tabel robi wyłącznie serwer (funkcje api/p24_*.js kluczem service_role, który omija RLS).
+-- Aplikacja może tylko ODCZYTAĆ własny wiersz Premium.
+-- =====================================================================
+create table if not exists public.premium_workdocs (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  plan text not null default 'premium',
+  since timestamptz not null default now(),
+  last_order_id text
+);
+alter table public.premium_workdocs enable row level security;
+drop policy if exists premium_select_own_workdocs on public.premium_workdocs;
+create policy premium_select_own_workdocs on public.premium_workdocs
+  for select to authenticated using (user_id = auth.uid());
+
+create table if not exists public.payments_workdocs (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null unique,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  email text,
+  amount integer not null,              -- w groszach (1000 = 10 zł)
+  currency text not null default 'PLN',
+  status text not null default 'pending', -- pending | paid | failed
+  p24_order_id bigint,
+  created_at timestamptz not null default now(),
+  paid_at timestamptz
+);
+create index if not exists payments_workdocs_user_idx on public.payments_workdocs(user_id);
+alter table public.payments_workdocs enable row level security;
+drop policy if exists payments_select_own_workdocs on public.payments_workdocs;
+create policy payments_select_own_workdocs on public.payments_workdocs
+  for select to authenticated using (user_id = auth.uid());
