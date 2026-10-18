@@ -259,7 +259,9 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
 .polys{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:2px 6px 6px}
 .drop .polys button{flex-direction:column;align-items:center;justify-content:flex-start;padding:6px 2px;gap:3px;font-size:10px;line-height:1.1;text-align:center;width:auto}
 .polys svg{width:34px;height:30px}
-#calc{display:none;right:14px;bottom:76px;width:276px;padding:12px;z-index:15;flex-direction:column;gap:8px}
+#calc{display:none;right:14px;bottom:76px;width:276px;max-width:calc(100% - 28px);max-height:calc(100% - 96px);overflow:auto;padding:12px;z-index:15;flex-direction:column;gap:8px}
+#calc>*{flex:none}
+#calc .calch{position:sticky;top:-12px;margin:-12px -12px 0;padding:12px 12px 6px;background:var(--surface);z-index:2;border-radius:16px 16px 0 0}
 #calc.open{display:flex}
 #mathLib{display:none;left:72px;top:64px;bottom:70px;width:376px;flex-direction:column;z-index:14;overflow:hidden;gap:0}
 #mathLib.open{display:flex}
@@ -298,7 +300,7 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
 .mlhint{margin:0;padding:8px 14px 10px;font-size:11.5px;border-top:1px solid var(--line)}
 .mlempty{grid-column:1/-1;color:var(--muted);padding:20px 4px;text-align:center}
 .mlghost{position:fixed;z-index:80;pointer-events:none;background:var(--surface);border:2px solid var(--accent);border-radius:10px;padding:6px 12px;font:600 12.5px Inter,sans-serif;box-shadow:var(--shadow);transform:translate(-50%,-120%);max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#calc.wide{width:468px}
+#calc.wide{width:min(468px,calc(100% - 28px))}
 #gcSvg{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:12px;touch-action:none;cursor:grab;user-select:none}
 #gcSvg:active{cursor:grabbing}
 #gcTxt{resize:vertical;font:500 13px ui-monospace,Consolas,monospace;width:100%;margin:0;text-align:left}
@@ -2903,6 +2905,7 @@ $('#calcIns').onclick=()=>{
 function toggleCalc(force){
   const on=force==null?!calcEl.classList.contains('open'):force;
   calcEl.classList.toggle('open',on);
+  if(on)clampCalc();
   if(on){const w=window;if(!w.matchMedia('(pointer:coarse)').matches&&innerWidth>700)setTimeout(()=>cin.focus(),30);}
 }
 $('#calcBtn').onclick=()=>toggleCalc();
@@ -2913,6 +2916,7 @@ function setCalcTab(t){
   $('#calcMain').style.display=t==='calc'?'flex':'none';$('#calcQuad').style.display=t==='quad'?'flex':'none';$('#calcGraph').style.display=t==='graph'?'flex':'none';
   calcEl.classList.toggle('wide',t==='graph');
   if(t==='quad')quadSolve();else if(t==='graph')gcRender();
+  clampCalc();
 }
 $('#calcTabs').addEventListener('click',e=>{const b=e.target.closest('[data-ct]');if(b)setCalcTab(b.dataset.ct);});
 /* zakładka: kalkulator graficzny (wiele funkcji, przesuwanie i zoom, miejsca zerowe) */
@@ -3004,12 +3008,22 @@ $('#qIns').onclick=()=>{
   });
   $('#calcHead').addEventListener('pointermove',ev=>{
     if(!d)return;
-    calcEl.style.left=Math.max(0,Math.min(ev.clientX-d.dx-d.sx,stage.clientWidth-80))+'px';
-    calcEl.style.top=Math.max(0,Math.min(ev.clientY-d.dy-d.sy,stage.clientHeight-60))+'px';
+    // panel zawsze mieści się w całości na tablicy (nie wychodzi poza ekran)
+    calcEl.style.left=Math.max(0,Math.min(ev.clientX-d.dx-d.sx,stage.clientWidth-calcEl.offsetWidth))+'px';
+    calcEl.style.top=Math.max(0,Math.min(ev.clientY-d.dy-d.sy,stage.clientHeight-calcEl.offsetHeight))+'px';
     calcEl.style.right='auto';calcEl.style.bottom='auto';
   });
   $('#calcHead').addEventListener('pointerup',()=>{d=null;});
+  $('#calcHead').addEventListener('pointercancel',()=>{d=null;});
 })();
+/* po zmianie zakładki, rozmiaru okna lub otwarciu: przesuń przeciągnięty panel tak, by był w całości widoczny */
+function clampCalc(){
+  if(!calcEl.classList.contains('open')||!calcEl.style.left)return;
+  const sw=stage.clientWidth,sh=stage.clientHeight;
+  calcEl.style.left=Math.max(0,Math.min(parseFloat(calcEl.style.left)||0,sw-calcEl.offsetWidth))+'px';
+  calcEl.style.top=Math.max(0,Math.min(parseFloat(calcEl.style.top)||0,sh-calcEl.offsetHeight))+'px';
+}
+addEventListener('resize',clampCalc);
 
 /* ---------- asystent AI ---------- */
 const AI_PRESETS={
