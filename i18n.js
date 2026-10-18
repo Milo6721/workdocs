@@ -331,5 +331,10 @@ window.WORKDOCS_EN = {
   'Nie udało się rozpocząć płatności.': 'Could not start the payment.',
   'Premium aktywne — dziękujemy! 🎉': 'Premium is active — thank you! 🎉',
   'Sprawdzam płatność…': 'Checking your payment…',
-  'Płatność w toku — Premium włączy się automatycznie, gdy bank potwierdzi (zwykle do minuty). Odśwież stronę za chwilę.': 'Payment in progress — Premium will turn on automatically once the bank confirms (usually within a minute). Refresh the page shortly.'
+  'Płatność w toku — Premium włączy się automatycznie, gdy bank potwierdzi (zwykle do minuty). Odśwież stronę za chwilę.': 'Payment in progress — Premium will turn on automatically once the bank confirms (usually within a minute). Refresh the page shortly.',
+  // --- Premium miesięczne ---
+  'Premium do {0}': 'Premium until {0}',
+  'Odblokuj biblioteki i funkcje dla uczniów i korepetytorów —': 'Unlock libraries and features for students and tutors —',
+  'za 30 dni (bez automatycznego odnawiania).': 'for 30 days (no automatic renewal).',
+  'Biblioteka matematyczna jest dostępna w planie Premium (10 zł / 30 dni).': 'The math library is part of the Premium plan (10 PLN / 30 days).'
 };

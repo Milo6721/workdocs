@@ -249,4 +249,11 @@ create index if not exists payments_workdocs_user_idx on public.payments_workdoc
 alter table public.payments_workdocs enable row level security;
 drop policy if exists payments_select_own_workdocs on public.payments_workdocs;
 create policy payments_select_own_workdocs on public.payments_workdocs
-  for select to authenticated using (user_id = auth.uid());
+  for select to authenticated using (user_id = auth.uid());
+
+-- ---------------------------------------------------------------------
+-- Premium jest MIESIĘCZNE: premium_until = do kiedy ważne. Kolejna płatność przedłuża o 30 dni.
+-- (bezpieczne do powtórzenia)
+-- ---------------------------------------------------------------------
+alter table public.premium_workdocs add column if not exists premium_until timestamptz;
+update public.premium_workdocs set premium_until = since + interval '30 days' where premium_until is null;

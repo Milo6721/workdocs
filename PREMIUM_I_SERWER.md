@@ -5,6 +5,7 @@ Wszystko jest już w kodzie. Poniżej tylko to, co musisz zrobić Ty (klucze i k
 ## Co działa
 - **Biblioteka matematyczna** (Σ) to funkcja Premium. Bez Premium widać kłódki na wszystkich kartach i okno „Zdobądź Premium — 10 zł”.
 - Klik „Zdobądź Premium” → (jeśli niezalogowany: logowanie) → strona płatności Przelewy24 → po zapłacie Przelewy24 woła `api/p24_notify.js`, który sprawdza podpis, potwierdza płatność i zapisuje Premium w bazie (tabela `premium_workdocs`, kto zapłacił: `payments_workdocs`). Po powrocie na stronę Premium włącza się samo.
+- **Premium jest miesięczne:** jedna płatność = 30 dni (kolumna `premium_until`). Kolejna płatność przedłuża o następne 30 dni, doliczone na koniec obecnego okresu. Odnowienie jest możliwe na tydzień przed końcem. Przelew nie odnawia się sam, więc użytkownik płaci ręcznie co miesiąc. Wiersz bez daty `premium_until` (np. dodany ręcznie) oznacza Premium bez końca.
 - **Potwierdzanie e-maila:** po rejestracji wysyłamy link. Jeśli poczta nie działa (limit, awaria, duży ruch), konto jest **od razu potwierdzone na stałe** i nie trzeba już nic robić.
 
 ## Krok 1 — baza (Supabase → SQL Editor)

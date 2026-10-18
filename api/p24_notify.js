@@ -62,7 +62,15 @@ module.exports = async function handler(req, res) {
 
     // 4) zapis: płatność + Premium dla konta
     await rest(`payments_workdocs?session_id=eq.${encodeURIComponent(n.sessionId)}`, 'PATCH', { status: 'paid', p24_order_id: Number(n.orderId), paid_at: new Date().toISOString() });
-    const up = await rest('premium_workdocs?on_conflict=user_id', 'POST', { user_id: pay.user_id, plan: 'premium', last_order_id: String(n.orderId) }, { prefer: 'resolution=merge-duplicates,return=minimal' });
+    // Premium na 30 dni; jeśli jeszcze trwa poprzednie, nowe 30 dni dolicza się na jego koniec
+    let from = Date.now();
+    try {
+      const ex = await rest(`premium_workdocs?select=premium_until&user_id=eq.${pay.user_id}`, 'GET');
+      const prev = ex.ok ? (await ex.json())[0] : null;
+      if (prev && prev.premium_until && new Date(prev.premium_until).getTime() > from) from = new Date(prev.premium_until).getTime();
+    } catch { /* liczymy od teraz */ }
+    const until = new Date(from + 30 * 24 * 3600 * 1000).toISOString();
+    const up = await rest('premium_workdocs?on_conflict=user_id', 'POST', { user_id: pay.user_id, plan: 'premium', premium_until: until, last_order_id: String(n.orderId) }, { prefer: 'resolution=merge-duplicates,return=minimal' });
     if (!up.ok) return done(500, 'db error'); // Przelewy24 ponowi powiadomienie
     return done(200, 'OK');
   } catch {

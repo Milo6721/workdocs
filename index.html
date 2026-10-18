@@ -599,7 +599,7 @@ sin(x)</textarea>
 
   <section id="mathLib" class="panel" aria-label="Biblioteka matematyczna">
     <div class="mlh"><span class="aibadge"><i data-i="sigma"></i>Matematyka</span><span class="grow"></span><button class="aix" id="mlClose" title="Zamknij" aria-label="Zamknij">×</button></div>
-    <div id="mlLock" class="mllock"><span class="mlli">🔒</span><div><b>Funkcja Premium</b><small>Biblioteka matematyczna jest dostępna w planie Premium (10 zł).</small></div><button class="btn primary" id="mlBuy">Zdobądź Premium</button></div>
+    <div id="mlLock" class="mllock"><span class="mlli">🔒</span><div><b>Funkcja Premium</b><small>Biblioteka matematyczna jest dostępna w planie Premium (10 zł / 30 dni).</small></div><button class="btn primary" id="mlBuy">Zdobądź Premium</button></div>
     <input id="mlSearch" class="dfield" type="text" autocomplete="off" spellcheck="false" placeholder="Szukaj wzoru, figury, tabeli…">
     <div class="mlcats" id="mlCats"></div>
     <div class="mlcats mlsub" id="mlSub"></div>
@@ -665,7 +665,7 @@ sin(x)</textarea>
 
 <dialog id="premDlg">
   <h3>Zdobądź Premium 🔒</h3>
-  <p class="hint" style="margin:0 0 10px">Odblokuj biblioteki i funkcje dla uczniów i korepetytorów — jednorazowo, <b id="premPrice">10 zł</b>.</p>
+  <p class="hint" style="margin:0 0 10px">Odblokuj biblioteki i funkcje dla uczniów i korepetytorów — <b id="premPrice">10 zł</b> za 30 dni (bez automatycznego odnawiania).</p>
   <ul class="premlist">
     <li><b>Biblioteka matematyczna</b> — ponad 100 wzorów, figury i bryły, wykresy, tabele, szablony dla korepetytora (kliknij lub przeciągnij na tablicę)</li>
     <li>Kolejne funkcje Premium — w przygotowaniu</li>
@@ -2630,9 +2630,10 @@ buildEqSelect();
 /* ---------- biblioteka matematyczna (uczniowie i korepetytorzy): kliknij kartę albo przeciągnij ją na tablicę ---------- */
 const mlEl=$('#mathLib'),mlGrid=$('#mlGrid');
 /* Premium: do czasu kont i płatności blokada jest po stronie interfejsu. Prawdziwe sprawdzenie (serwer) opisano w PREMIUM_I_SERWER.md. */
-const isPremium=()=>{try{const c=window.WORKDOCS_CONFIG||{};return !!(c.premiumAll||(typeof cloud!=='undefined'&&cloud&&cloud.premium===true));}catch(e){return false;}};
+const isPremium=()=>{try{const c=window.WORKDOCS_CONFIG||{};return !!(c.premiumAll||(typeof cloud!=='undefined'&&cloud&&cloud.premium===true&&(!cloud.premiumUntil||cloud.premiumUntil>Date.now())));}catch(e){return false;}};
 const PREMIUM_PRICE='10 zł';
-function mlLockUI(){const on=!isPremium();$('#mlLock').classList.toggle('on',on);$('#mathBtn').classList.toggle('locked',on);}
+function mlLockUI(){const on=!isPremium();
+  try{const b=$('#mathBtn'),base=tr('Biblioteka matematyczna (M)');b.title=!on&&cloud.premiumUntil?base+' — '+tf('Premium do {0}',new Date(cloud.premiumUntil).toLocaleDateString(LANG==='en'?'en-GB':'pl-PL')):base;}catch(e){}$('#mlLock').classList.toggle('on',on);$('#mathBtn').classList.toggle('locked',on);}
 function showPremium(){mlLockUI();$('#premDlg').showModal();}
 let premReturn=new URLSearchParams(location.search).get('premium')==='return';
 if(premReturn)try{history.replaceState(null,'',location.pathname);}catch(e){}
@@ -2641,7 +2642,12 @@ async function refreshPremium(announce){
   const was=cloud.premium===true;
   if(!cloud.sb||!cloud.user)cloud.premium=false;
   else{
-    try{const{data,error}=await cloud.sb.from('premium_workdocs').select('user_id').eq('user_id',cloud.user.id);cloud.premium=!error&&Array.isArray(data)&&data.length>0;}catch(e){/* zostaje poprzedni stan */}
+    try{
+      const{data,error}=await cloud.sb.from('premium_workdocs').select('user_id,premium_until').eq('user_id',cloud.user.id);
+      const row=!error&&Array.isArray(data)?data[0]:null,until=row&&row.premium_until?Date.parse(row.premium_until):0;
+      cloud.premiumUntil=until; // 0 = bez daty końca (np. nadane ręcznie)
+      cloud.premium=!!row&&(!until||until>Date.now());
+    }catch(e){/* zostaje poprzedni stan */}
   }
   mlLockUI();if(mlEl.classList.contains('open'))mlBuild();
   if(!was&&cloud.premium&&announce)toast('Premium aktywne — dziękujemy! 🎉');

@@ -51,8 +51,10 @@ module.exports = async function handler(req, res) {
 
   try {
     // już ma Premium?
-    const ex = await rest(`premium_workdocs?select=user_id&user_id=eq.${user.id}`, 'GET');
-    if (ex.ok && (await ex.json()).length) return send(res, 200, { already: true });
+    const ex = await rest(`premium_workdocs?select=premium_until&user_id=eq.${user.id}`, 'GET');
+    const prem = ex.ok ? (await ex.json())[0] : null;
+    // aktywne Premium z zapasem > 7 dni: nie pozwalamy płacić drugi raz przez pomyłkę (odnowienie można zrobić na tydzień przed końcem)
+    if (prem && prem.premium_until && new Date(prem.premium_until).getTime() - Date.now() > 7 * 24 * 3600 * 1000) return send(res, 200, { already: true, until: prem.premium_until });
 
     const amount = Number(env.PREMIUM_PRICE_GR) || 1000;
     const sessionId = 'wd_' + crypto.randomUUID();
