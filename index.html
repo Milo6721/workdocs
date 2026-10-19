@@ -2632,7 +2632,10 @@ buildEqSelect();
 /* ---------- biblioteka matematyczna (uczniowie i korepetytorzy): kliknij kartę albo przeciągnij ją na tablicę ---------- */
 const mlEl=$('#mathLib'),mlGrid=$('#mlGrid');
 /* Premium: do czasu kont i płatności blokada jest po stronie interfejsu. Prawdziwe sprawdzenie (serwer) opisano w PREMIUM_I_SERWER.md. */
-const isPremium=()=>{try{const c=window.WORKDOCS_CONFIG||{};return !!(c.premiumAll||(typeof cloud!=='undefined'&&cloud&&cloud.premium===true&&(!cloud.premiumUntil||cloud.premiumUntil>Date.now())));}catch(e){return false;}};
+/* Na razie WSZYSTKO jest darmowe. Kod Premium i płatności (Przelewy24) zostaje, ale jest wyłączony.
+   Włączenie później: w config.js dodaj  premiumEnabled: true  (patrz PREMIUM_I_SERWER.md). */
+const premiumOn=()=>!!(window.WORKDOCS_CONFIG&&window.WORKDOCS_CONFIG.premiumEnabled);
+const isPremium=()=>{if(!premiumOn())return true;try{const c=window.WORKDOCS_CONFIG||{};return !!(c.premiumAll||(typeof cloud!=='undefined'&&cloud&&cloud.premium===true&&(!cloud.premiumUntil||cloud.premiumUntil>Date.now())));}catch(e){return false;}};
 const PREMIUM_PRICE='10 zł';
 function mlLockUI(){const on=!isPremium();
   try{const b=$('#mathBtn'),base=tr('Biblioteka matematyczna (M)');b.title=!on&&cloud.premiumUntil?base+' — '+tf('Premium do {0}',new Date(cloud.premiumUntil).toLocaleDateString(LANG==='en'?'en-GB':'pl-PL')):base;}catch(e){}$('#mlLock').classList.toggle('on',on);$('#mathBtn').classList.toggle('locked',on);}
@@ -2641,6 +2644,7 @@ let premReturn=new URLSearchParams(location.search).get('premium')==='return';
 if(premReturn)try{history.replaceState(null,'',location.pathname);}catch(e){}
 const premNote=t=>{$('#premNote').textContent=tr(t);};
 async function refreshPremium(announce){
+  if(!premiumOn()){mlLockUI();return true;} // Premium wyłączone: nic nie pytamy bazy, wszystko odblokowane
   const was=cloud.premium===true;
   if(!cloud.sb||!cloud.user)cloud.premium=false;
   else{
@@ -3436,7 +3440,7 @@ function updateAccUI(){
 }
 async function cloudSignedIn(){
   cloud.status='saved';renderTabs();
-  if(premReturn){premReturn=false;watchPremium();}else refreshPremium(false);
+  if(premReturn&&premiumOn()){premReturn=false;watchPremium();}else refreshPremium(false);
   if($('#cloudDlg').open)renderCloudDlg();
   await openFromUrl();
   const b=board();

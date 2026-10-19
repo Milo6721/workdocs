@@ -1,5 +1,11 @@
 # Premium, płatność 10 zł (Przelewy24), potwierdzanie e-maila i serwer
 
+> **Stan obecny: Premium jest WYŁĄCZONE. Wszystko w Work Docs jest darmowe** (biblioteka matematyczna bez kłódek, bez okna płatności). Cały kod Premium i płatności zostaje w projekcie i czeka. Żeby je włączyć, dopisz w `config.js` linię `premiumEnabled: true` (i skonfiguruj płatności według kroków poniżej), np.:
+>
+> ```js
+> window.WORKDOCS_CONFIG = { supabaseUrl: '…', supabaseAnonKey: '…', premiumEnabled: true };
+> ```
+
 Wszystko jest już w kodzie. Poniżej tylko to, co musisz zrobić Ty (klucze i kilka kliknięć).
 
 ## Co działa
