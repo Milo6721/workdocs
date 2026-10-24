@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wspólna tablica online — praca na żywo | Work Docs</title>
+<meta name="description" content="Wspólna tablica online: udostępnij ją e-mailem i pracujcie jednocześnie, widząc kursory i zaznaczenia. Funkcja Śledź przesuwa widok razem z drugą osobą.">
+<link rel="canonical" href="https://www.workdocs.online/wspolna-tablica-online/">
+<meta name="theme-color" content="#FBF4EA">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Work Docs">
+<meta property="og:title" content="Wspólna tablica online — praca na żywo | Work Docs">
+<meta property="og:description" content="Wspólna tablica online: udostępnij ją e-mailem i pracujcie jednocześnie, widząc kursory i zaznaczenia. Funkcja Śledź przesuwa widok razem z drugą osobą.">
+<meta property="og:url" content="https://www.workdocs.online/wspolna-tablica-online/">
+<meta property="og:image" content="https://www.workdocs.online/icon-512.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Czy muszę mieć konto, żeby udostępnić tablicę?","acceptedAnswer":{"@type":"Answer","text":"Tak. Do zapisu tablicy w chmurze i udostępniania potrzebne jest konto. Bez konta tablica zapisuje się tylko w Twojej przeglądarce."}},{"@type":"Question","name":"Czy druga osoba też musi mieć konto?","acceptedAnswer":{"@type":"Answer","text":"Tak, osoba, której udostępniasz tablicę, loguje się na swoje konto z tym samym adresem e-mail, na który ją udostępniłeś."}},{"@type":"Question","name":"Czy zmiany są widoczne od razu?","acceptedAnswer":{"@type":"Answer","text":"Tak. Zmiany, kursory i zaznaczenia są przesyłane na żywo."}},{"@type":"Question","name":"Co robi funkcja Śledź?","acceptedAnswer":{"@type":"Answer","text":"Po kliknięciu awatara osoby Twój widok przesuwa się i przybliża razem z jej widokiem. Przestajesz śledzić, gdy sam przesuniesz tablicę albo klikniesz „Przestań śledzić”."}},{"@type":"Question","name":"Czy to jest darmowe?","acceptedAnswer":{"@type":"Answer","text":"Tak, obecnie wszystkie funkcje Work Docs są darmowe."}}]}</script>
+<style>
+:root{--bg:#FBF4EA;--ink:#2B2118;--muted:#6f5f50;--line:#EADFD2;--acc:#EA6A1F}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 Inter,system-ui,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#B8430C}
+header,main,footer{max-width:900px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;gap:12px;padding-top:18px;padding-bottom:10px}
+header img{width:42px;height:42px;border-radius:12px}
+header b{font:600 22px Georgia,serif}header b span{color:var(--acc)}
+.btn{display:inline-block;background:linear-gradient(135deg,#FFA043,#F0501A);color:#fff;text-decoration:none;font-weight:600;padding:13px 24px;border-radius:14px;box-shadow:0 4px 14px rgba(240,80,26,.3)}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.hero{padding:44px 0 26px}
+h1{font:600 clamp(32px,6vw,52px)/1.1 Georgia,serif;margin:0 0 16px;letter-spacing:-.01em}
+h1 em{color:var(--acc);font-style:normal}
+h2{font:600 28px/1.2 Georgia,serif;margin:44px 0 12px}
+h3{margin:0 0 6px;font-size:18px}
+.lead{font-size:20px;color:var(--muted);max-width:660px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}
+.card p{margin:0;color:var(--muted);font-size:15.5px;line-height:1.55}
+ol,ul{padding-left:22px}li{margin:6px 0}
+code{background:#FFF1E4;border-radius:6px;padding:1px 6px;font:500 15px ui-monospace,Consolas,monospace}
+table{border-collapse:collapse;width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:15.5px}
+td,th{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#FFE9D6}
+.f{font-family:"Cambria Math","Latin Modern Math",Georgia,serif;font-size:18px}
+details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}details p{margin:10px 0 0;color:var(--muted)}
+.band{background:linear-gradient(135deg,#FFF1E4,#FFE2CC);border:1px solid #F3C7A5;border-radius:22px;padding:30px;margin:44px 0;text-align:center}
+.band h2{margin-top:0}
+.rel a{display:inline-block;margin:4px 8px 4px 0}
+footer{padding-top:30px;padding-bottom:40px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:30px}
+footer a{margin-right:14px;display:inline-block}
+</style>
+</head>
+<body>
+<header>
+  <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit"><img src="/logo.webp" alt="Logo Work Docs" width="42" height="42"><b>Work <span>Docs</span></b></a>
+</header>
+<main>
+  <section class="hero">
+    <h1>Wspólna tablica <em>online</em></h1>
+    <p class="lead">Udostępnij tablicę uczniowi, koledze lub zespołowi i pracujcie na niej jednocześnie. Widzicie swoje kursory, zaznaczenia i zmiany w czasie rzeczywistym.</p>
+    <div class="cta"><a class="btn" href="/">Otwórz Work Docs</a><a class="btn sec" href="#tresc">Jak to działa?</a></div>
+  </section>
+  <div id="tresc"></div>
+  <h2>Jak pracować razem na jednej tablicy</h2>
+  <ol>
+    <li><b>Załóż konto</b> i zapisz tablicę w chmurze.</li>
+    <li><b>Udostępnij ją</b> na adres e-mail drugiej osoby i wybierz, czy ma mieć prawo edycji, czy tylko podgląd.</li>
+    <li><b>Pracujcie razem.</b> Zmiany pojawiają się u obu osób od razu.</li>
+  </ol>
+  <h2>Co widzisz podczas wspólnej pracy</h2>
+  <div class="grid">
+    <div class="card"><h3>Kursory na żywo</h3><p>Widzisz, gdzie druga osoba właśnie wskazuje kursorem, razem z jej nazwą (początkiem adresu e-mail).</p></div>
+    <div class="card"><h3>Zaznaczenia</h3><p>Elementy, które ktoś zaznaczył lub edytuje, są oznaczone w jego kolorze, a przy tekście widać „pisze…”.</p></div>
+    <div class="card"><h3>Funkcja Śledź</h3><p>Kliknij awatar osoby, a Twój widok będzie płynnie podążał za jej widokiem. Idealne, gdy ktoś prowadzi lekcję lub prezentację.</p></div>
+    <div class="card"><h3>Zapis w chmurze</h3><p>Tablica zapisuje się automatycznie, więc możesz do niej wrócić z innego urządzenia.</p></div>
+    <div class="card"><h3>Uprawnienia</h3><p>Możesz dać komuś prawo edycji albo tylko podglądu.</p></div>
+    <div class="card"><h3>Bez instalowania</h3><p>Wszystko działa w przeglądarce na komputerze, tablecie i telefonie.</p></div>
+  </div>
+  <h2>Do czego użyjesz wspólnej tablicy</h2>
+  <ul>
+    <li>korepetycje na odległość (uczeń i korepetytor na tej samej tablicy),</li>
+    <li>nauka w parach i grupowe powtórki przed sprawdzianem,</li>
+    <li>burza mózgów i planowanie projektów,</li>
+    <li>prezentowanie rozwiązań zadań z matematyki.</li>
+  </ul>
+  <div class="band">
+    <h2>Wypróbuj za darmo</h2>
+    <p>Bez instalowania. Tablica działa od razu w przeglądarce, a obecnie wszystkie funkcje są darmowe.</p>
+    <a class="btn" href="/">Otwórz Work Docs</a>
+  </div>
+  <h2>Najczęstsze pytania</h2>
+  <details><summary>Czy muszę mieć konto, żeby udostępnić tablicę?</summary><p>Tak. Do zapisu tablicy w chmurze i udostępniania potrzebne jest konto. Bez konta tablica zapisuje się tylko w Twojej przeglądarce.</p></details>
+  <details><summary>Czy druga osoba też musi mieć konto?</summary><p>Tak, osoba, której udostępniasz tablicę, loguje się na swoje konto z tym samym adresem e-mail, na który ją udostępniłeś.</p></details>
+  <details><summary>Czy zmiany są widoczne od razu?</summary><p>Tak. Zmiany, kursory i zaznaczenia są przesyłane na żywo.</p></details>
+  <details><summary>Co robi funkcja Śledź?</summary><p>Po kliknięciu awatara osoby Twój widok przesuwa się i przybliża razem z jej widokiem. Przestajesz śledzić, gdy sam przesuniesz tablicę albo klikniesz „Przestań śledzić”.</p></details>
+  <details><summary>Czy to jest darmowe?</summary><p>Tak, obecnie wszystkie funkcje Work Docs są darmowe.</p></details>
+  <h2>Zobacz także</h2>
+  <p class="rel"><a href="/korepetycje/">Tablica dla korepetytorów</a><a href="/tablica-do-nauki/">Tablica do nauki online</a><a href="/tablica-do-matematyki/">Tablica do matematyki</a><a href="/wykresy-funkcji-online/">Wykresy funkcji online</a><a href="/wzory-matematyczne/">Wzory matematyczne</a><a href="/mapa-mysli-online/">Mapa myśli online</a></p>
+</main>
+<footer>
+  <a href="/">Work Docs</a><a href="/korepetycje/">Tablica dla korepetytorów</a><a href="/tablica-do-nauki/">Tablica do nauki online</a><a href="/tablica-do-matematyki/">Tablica do matematyki</a><a href="/wykresy-funkcji-online/">Wykresy funkcji online</a><a href="/wzory-matematyczne/">Wzory matematyczne</a><a href="/mapa-mysli-online/">Mapa myśli online</a><a href="/wspolna-tablica-online/">Wspólna tablica online</a><br>
+  © MGS Corporation 2026
+</footer>
+</body>
+</html>
