@@ -960,8 +960,8 @@ let saveT=0,warned=false;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify({...state,imgs:usedImgs()}));}catch(e){if(!warned){warned=true;toast('Brak miejsca w pamięci przeglądarki — pobierz tablicę jako JSON');}}},250);}
 const H=()=>{const b=board();let h=hists.get(b.id);if(!h){h={undo:[],redo:[],cur:JSON.stringify(b.els)};hists.set(b.id,h);}return h;};
 function commit(){const h=H(),s=JSON.stringify(board().els);if(s!==h.cur){h.undo.push(h.cur);if(h.undo.length>100)h.undo.shift();h.cur=s;h.redo=[];}save();updateUndo();cloudSchedule();}
-function undo(){commitEdit();const h=H();if(!h.undo.length)return;h.redo.push(h.cur);h.cur=h.undo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();cloudSchedule();}
-function redo(){commitEdit();const h=H();if(!h.redo.length)return;h.undo.push(h.cur);h.cur=h.redo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();cloudSchedule();}
+function undo(){commitEdit();lastUserDelete=Date.now();const h=H();if(!h.undo.length)return;h.redo.push(h.cur);h.cur=h.undo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();cloudSchedule();}
+function redo(){commitEdit();lastUserDelete=Date.now();const h=H();if(!h.redo.length)return;h.undo.push(h.cur);h.cur=h.redo.pop();board().els=JSON.parse(h.cur);pruneSel();render();save();cloudSchedule();}
 function pruneSel(){for(const id of [...sel])if(!find(id))sel.delete(id);}
 function updateUndo(){const h=H();$('#undo').disabled=!h.undo.length;$('#redo').disabled=!h.redo.length;}
 
@@ -1608,7 +1608,7 @@ $('#aBack').onclick=()=>reorder(false);
 $('#styleFab').onclick=()=>$('#props').classList.toggle('open');
 document.addEventListener('click',e=>{const m=e.target.closest('[data-more]');if(m){$$('.menu.open').forEach(x=>x.classList.remove('open'));$('#'+m.dataset.more).click();}});
 
-function deleteSel(){if(!sel.size)return;board().els=board().els.filter(e=>!sel.has(e.id));sel.clear();render();commit();}
+function deleteSel(){if(!sel.size)return;lastUserDelete=Date.now();board().els=board().els.filter(e=>!sel.has(e.id));sel.clear();render();commit();}
 function reorder(front){
   const els=board().els,s=selEls();if(!s.length)return;
   const rest=els.filter(e=>!sel.has(e.id));board().els=front?[...rest,...els.filter(e=>sel.has(e.id))]:[...els.filter(e=>sel.has(e.id)),...rest];
@@ -1686,7 +1686,7 @@ function shapeAt(ev,exceptId,except2){
 }
 function eraseAt(ev){
   const t=document.elementFromPoint(ev.clientX,ev.clientY),n=t&&t.closest&&t.closest('#els [data-id]');
-  if(n){const id=n.dataset.id;board().els=board().els.filter(e=>e.id!==id);n.remove();drag.hit=true;}
+  if(n){const id=n.dataset.id;lastUserDelete=Date.now();board().els=board().els.filter(e=>e.id!==id);n.remove();drag.hit=true;}
 }
 svg.addEventListener('pointerdown',ev=>{
   if(editing)commitEdit();
@@ -1999,7 +1999,7 @@ $('#tabs').addEventListener('click',e=>{
   const i=+b.dataset.i;
   if(e.target.dataset.del){
     const bd=state.boards[i],msg=bd.cloud?tf('Zamknąć tablicę „{0}”? W chmurze zostanie — otworzysz ją ponownie z menu Konto i chmura.',bd.name):tf('Usunąć tablicę „{0}”? Tego nie da się cofnąć.',bd.name);
-    if(confirm(msg)){cloudDetach(bd);state.boards.splice(i,1);state.cur=Math.min(state.cur,state.boards.length-1);switchBoard(state.cur);}
+    if(confirm(msg)){cloudDetach(bd);if(bd.cloud)RT.delete(bd.cloud.id);state.boards.splice(i,1);state.cur=Math.min(state.cur,state.boards.length-1);switchBoard(state.cur);}
     return;
   }
   if(i!==state.cur)switchBoard(i);
@@ -2125,7 +2125,7 @@ $('#mFile').addEventListener('click',e=>{
     case'print':if(!board().els.length)return toast('Tablica jest pusta');buildPrint();setTimeout(()=>print(),60);break;
     case'json':{const b=board();download(new Blob([JSON.stringify({app:'workdocs',version:1,board:{name:b.name,els:b.els,view:b.view},imgs:usedImgs([b])},null,1)],{type:'application/json'}),fname()+'.json');toast('Zapisano plik JSON');break;}
     case'import':$('#fileIn').click();break;
-    case'clear':if(board().els.length&&confirm(tr('Wyczyścić całą tablicę? Możesz to jeszcze cofnąć (Ctrl+Z).'))){board().els=[];sel.clear();render();commit();}break;
+    case'clear':if(board().els.length&&confirm(tr('Wyczyścić całą tablicę? Możesz to jeszcze cofnąć (Ctrl+Z).'))){lastUserDelete=Date.now();board().els=[];sel.clear();render();commit();}break;
   }
 });
 $('#fileIn').addEventListener('change',ev=>{const f=ev.target.files[0];ev.target.value='';if(f)importFile(f);});
@@ -3404,7 +3404,7 @@ function applyAI(r){
 const CFG=window.WORKDOCS_CONFIG||{};
 const T_B='boards_workdocs',T_M='board_members_workdocs',T_E='board_elements_workdocs',T_I='board_images_workdocs';
 const rcurs=new Map();
-let lastTs=0,curT=0,authMode='login',authBusy=false,shId=null,shName='';
+let lastUserDelete=0,lastTs=0,curT=0,authMode='login',authBusy=false,shId=null,shName='';
 function isRO(){const b=board();return !!(b&&b.cloud&&b.cloud.role==='view');}
 const nextTs=()=>{lastTs=Math.max(Date.now()*1000,lastTs+1);return lastTs;};
 const hue=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h;};
@@ -3480,18 +3480,22 @@ function localPending(rt,b){
   for(const id of rt.synced.keys())if(!seen.has(id))del.push(id);
   return{up,del};
 }
+/* Bezpiecznik: usunięcie (prawie) wszystkich elementów z chmury bez świadomej akcji użytkownika jest podejrzane. */
+const massDel=(rt,n)=>n>=3&&n>=rt.synced.size*0.8&&Date.now()-lastUserDelete>120000;
 function waitPush(rt){return new Promise(res=>{const t=setInterval(()=>{if(!rt.pushing){clearInterval(t);clearTimeout(to);res();}},40),to=setTimeout(()=>{clearInterval(t);res();},8000);});}
 async function cloudStart(b,{fetch=true}={}){
   if(!cloud.sb||!cloud.user||!b.cloud)return;
   const cid=b.cloud.id;let rt=RT.get(cid);
+  if(rt&&rt.boardRef&&rt.boardRef!==b){RT.delete(cid);rt=null;} // to nowa lokalna kopia tablicy (np. po zamknięciu karty): stary stan synchronizacji do niej nie pasuje
   if(!rt){rt=newRT(cid);RT.set(cid,rt);}
+  rt.boardRef=b;
   if(rt.starting)return;
   rt.starting=true;setStatus('saving');let overlay=false;
   try{
     // najpierw dokończ wysyłanie tego, co uczeń/nauczyciel zdążył zrobić przed przełączeniem tablicy
     if(fetch&&rt.loaded&&b.cloud.role!=='view'){
       if(rt.pushing)await waitPush(rt);
-      const p0=localPending(rt,b);if(p0.up.length||p0.del.length){clearTimeout(rt.saveT);await cloudPush(b);if(rt.pushing)await waitPush(rt);}
+      const p0=localPending(rt,b);if(p0.up.length||(p0.del.length&&!massDel(rt,p0.del.length))){clearTimeout(rt.saveT);await cloudPush(b);if(rt.pushing)await waitPush(rt);}
     }
     if(fetch){
       const sb=cloud.sb;
@@ -3510,6 +3514,7 @@ async function cloudStart(b,{fetch=true}={}){
       (ir&&!ir.error?ir.data||[]:[]).forEach(r=>{if(imgKey(r.key)&&typeof r.data==='string'&&r.data.startsWith('data:image/')){IMGS[r.key]=r.data;rt.imgs.add(r.key);}});
       // zmiany lokalne niewysłane do bazy (np. wysyłka się nie udała albo powstały w trakcie pobierania) nie mogą zginąć
       const pend=rt.loaded&&b.cloud.role!=='view'?localPending(rt,b):{up:[],del:[]};
+      if(massDel(rt,pend.del.length))pend.del=[]; // nie traktuj masowego zniknięcia elementów jako zamierzonego usunięcia
       rt.synced.clear();rt.ts.clear();rt.z.clear();rt.remoteLive.clear();
       const els=[];
       for(const r of er.data||[]){const el=clean(r.data);if(!el)continue;el.id=String(r.id);els.push(el);rt.synced.set(el.id,JSON.stringify(el));rt.ts.set(el.id,Number(r.ts)||0);rt.z.set(el.id,Number(r.z)||0);}
@@ -3850,7 +3855,11 @@ async function cloudPush(b){
       const json=JSON.stringify(e);cur.set(e.id,json);
       if(rt.synced.get(e.id)!==json||rt.z.get(e.id)!==z)ups.push({e,json,z});
     }
-    const dels=[...rt.synced.keys()].filter(id=>!cur.has(id));
+    let dels=[...rt.synced.keys()].filter(id=>!cur.has(id));
+    if(massDel(rt,dels.length)){
+      if(confirm(tf('Za chwilę z chmury zostanie usuniętych {0} z {1} elementów tej tablicy. Czy to na pewno zamierzone?',dels.length,rt.synced.size)))lastUserDelete=Date.now();
+      else{dels=[];setTimeout(()=>{const bb=boardOf(rt);if(bb)cloudStart(bb,{fetch:true});},50);} // przywróć stan z chmury
+    }
     const imgRows=[];
     for(const u of ups)if(u.e.type==='image'&&IMGS[u.e.src]&&!rt.imgs.has(u.e.src)&&!imgRows.some(r=>r.key===u.e.src))imgRows.push({board_id:cid,key:u.e.src,data:IMGS[u.e.src]});
     if(imgRows.length){const{error}=await cloud.sb.from(T_I).upsert(imgRows,{onConflict:'board_id,key',ignoreDuplicates:true});if(error)throw error;imgRows.forEach(r=>rt.imgs.add(r.key));}

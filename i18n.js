@@ -340,5 +340,6 @@ window.WORKDOCS_EN = {
   // --- nowa wersja i błędy zapisu ---
   'Dostępna nowa wersja Work Docs. Odśwież, aby dostać poprawki (Twoje zmiany zostaną najpierw zapisane).': 'A new version of Work Docs is available. Refresh to get the fixes (your changes will be saved first).',
   'Odśwież teraz': 'Refresh now',
-  'Nie udało się zapisać w chmurze ({0}) — ponawiam…': 'Could not save to the cloud ({0}) — retrying…'
+  'Nie udało się zapisać w chmurze ({0}) — ponawiam…': 'Could not save to the cloud ({0}) — retrying…',
+  'Za chwilę z chmury zostanie usuniętych {0} z {1} elementów tej tablicy. Czy to na pewno zamierzone?': '{0} of {1} elements of this board are about to be deleted from the cloud. Is this really intended?'
 };
