@@ -336,5 +336,9 @@ window.WORKDOCS_EN = {
   'Premium do {0}': 'Premium until {0}',
   'Odblokuj biblioteki i funkcje dla uczniów i korepetytorów —': 'Unlock libraries and features for students and tutors —',
   'za 30 dni (bez automatycznego odnawiania).': 'for 30 days (no automatic renewal).',
-  'Biblioteka matematyczna jest dostępna w planie Premium (10 zł / 30 dni).': 'The math library is part of the Premium plan (10 PLN / 30 days).'
+  'Biblioteka matematyczna jest dostępna w planie Premium (10 zł / 30 dni).': 'The math library is part of the Premium plan (10 PLN / 30 days).',
+  // --- nowa wersja i błędy zapisu ---
+  'Dostępna nowa wersja Work Docs. Odśwież, aby dostać poprawki (Twoje zmiany zostaną najpierw zapisane).': 'A new version of Work Docs is available. Refresh to get the fixes (your changes will be saved first).',
+  'Odśwież teraz': 'Refresh now',
+  'Nie udało się zapisać w chmurze ({0}) — ponawiam…': 'Could not save to the cloud ({0}) — retrying…'
 };

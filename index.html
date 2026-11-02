@@ -314,6 +314,11 @@ body.ro #tools,body.ro #props,body.ro #styleFab,body.ro #aiFab,body.ro #aiBar,bo
 #peers .pc.fol{outline:3px solid #fff;box-shadow:0 0 0 5px var(--accent),0 2px 8px rgba(0,0,0,.25);z-index:2;position:relative}
 #followBar{display:none;left:50%;top:70px;transform:translateX(-50%);padding:7px 8px 7px 16px;align-items:center;gap:10px;font:500 13px Inter,sans-serif;z-index:20;white-space:nowrap}
 #followBar.on{display:flex}
+#updBar{display:none;left:50%;top:14px;transform:translateX(-50%);padding:9px 10px 9px 16px;align-items:center;gap:12px;font:500 13px Inter,sans-serif;z-index:60;max-width:min(680px,calc(100% - 24px));background:#FFF4E5;border-color:#F3C7A5}
+#updBar.on{display:flex}
+#updBar button{border:0;background:var(--grad);color:#fff;border-radius:99px;padding:7px 14px;font:600 12.5px Inter,sans-serif;cursor:pointer;white-space:nowrap}
+#updBar button:disabled{opacity:.6}
+@media (max-width:700px){#updBar{flex-direction:column;align-items:stretch;text-align:center;top:60px}}
 #followBar .fdot{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:fpulse 1.4s infinite}
 @keyframes fpulse{0%,100%{opacity:1}50%{opacity:.3}}
 #followBar button{border:0;background:var(--accent-soft);color:#B8430C;border-radius:99px;padding:5px 12px;font:600 12.5px Inter,sans-serif;cursor:pointer}
@@ -637,6 +642,7 @@ sin(x)</textarea>
   </div>
 
   <div id="peers"></div>
+  <div id="updBar" class="panel" role="status"><span>Dostępna nowa wersja Work Docs. Odśwież, aby dostać poprawki (Twoje zmiany zostaną najpierw zapisane).</span><button id="updBtn">Odśwież teraz</button></div>
   <div id="followBar" class="panel" role="status"><span class="fdot"></span><span id="followTxt"></span><button id="followStop">Przestań śledzić</button></div>
   <div id="cursors"></div>
   <div id="roPill">Tylko podgląd</div>
@@ -3863,6 +3869,7 @@ async function cloudPush(b){
     const msg=String(e&&e.message||e);
     setStatus(navigator.onLine===false?'offline':'error');
     if(/row-level security|permission/i.test(msg))toast('Brak uprawnień do zapisu tej tablicy.');
+    else if(Date.now()-(rt.errToastAt||0)>15000){rt.errToastAt=Date.now();toast(tf('Nie udało się zapisać w chmurze ({0}) — ponawiam…',msg.slice(0,70)));}
     rt.dirty=true;clearTimeout(rt.retryT);rt.retryT=setTimeout(()=>{const bb=boardOf(rt);if(bb)cloudPush(bb);},5000);
   }finally{
     rt.pushing=false;
@@ -4122,6 +4129,17 @@ function setLang(l){
   if(calcEl.classList.contains('open'))calcPreview();
 }
 $('#langBtn').onclick=()=>setLang(LANG==='pl'?'en':'pl');
+
+/* ---------- nowa wersja: powiadom, gdy otwarta karta ma starą wersję aplikacji ---------- */
+let verTag=null;
+async function verFetch(){try{const r=await fetch(location.pathname,{method:'HEAD',cache:'no-store'});return r.ok?(r.headers.get('etag')||r.headers.get('last-modified')||''):'';}catch(e){return'';}}
+async function verCheck(){const t=await verFetch();if(!t)return;if(verTag===null){verTag=t;return;}if(t!==verTag)$('#updBar').classList.add('on');}
+$('#updBtn').onclick=async()=>{ // najpierw bezpiecznie zapisz niezapisane zmiany w chmurze, potem odśwież
+  $('#updBtn').disabled=true;
+  try{commitEdit();for(const b of state.boards){const rt=b.cloud&&RT.get(b.cloud.id);if(rt&&(rt.dirty||rt.pushing)&&b.cloud.role!=='view'){clearTimeout(rt.saveT);if(rt.pushing)await waitPush(rt);await cloudPush(b);if(rt.pushing)await waitPush(rt);}}}catch(e){}
+  save();setTimeout(()=>location.reload(),300);
+};
+verCheck();setInterval(verCheck,90000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)verCheck();});
 
 /* ---------- start ---------- */
 cloudInit();
