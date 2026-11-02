@@ -3467,13 +3467,26 @@ function cloudDetach(b){
   rt.liveOK=false;rt.peerCount=0;clearTimeout(rt.liveT);rt.liveT=0;rt.live.clear();
   renderPeers([]);
 }
+/* Zmiany lokalne, których nie ma jeszcze w bazie (względem ostatniego stanu zsynchronizowanego). */
+function localPending(rt,b){
+  const up=[],del=[],seen=new Set();
+  for(const e of b.els){seen.add(e.id);if(rt.remoteLive.has(e.id)&&!rt.synced.has(e.id))continue;if(rt.synced.get(e.id)!==JSON.stringify(e))up.push(e);}
+  for(const id of rt.synced.keys())if(!seen.has(id))del.push(id);
+  return{up,del};
+}
+function waitPush(rt){return new Promise(res=>{const t=setInterval(()=>{if(!rt.pushing){clearInterval(t);clearTimeout(to);res();}},40),to=setTimeout(()=>{clearInterval(t);res();},8000);});}
 async function cloudStart(b,{fetch=true}={}){
   if(!cloud.sb||!cloud.user||!b.cloud)return;
   const cid=b.cloud.id;let rt=RT.get(cid);
   if(!rt){rt=newRT(cid);RT.set(cid,rt);}
   if(rt.starting)return;
-  rt.starting=true;setStatus('saving');
+  rt.starting=true;setStatus('saving');let overlay=false;
   try{
+    // najpierw dokończ wysyłanie tego, co uczeń/nauczyciel zdążył zrobić przed przełączeniem tablicy
+    if(fetch&&rt.loaded&&b.cloud.role!=='view'){
+      if(rt.pushing)await waitPush(rt);
+      const p0=localPending(rt,b);if(p0.up.length||p0.del.length){clearTimeout(rt.saveT);await cloudPush(b);if(rt.pushing)await waitPush(rt);}
+    }
     if(fetch){
       const sb=cloud.sb;
       const[er,ir,br,mr]=await Promise.all([
@@ -3489,10 +3502,15 @@ async function cloudStart(b,{fetch=true}={}){
       }
       if(br.data){b.name=br.data.name||b.name;b.cloud.role=br.data.owner_id===cloud.user.id?'owner':(mr.data&&mr.data.role)||'view';}
       (ir&&!ir.error?ir.data||[]:[]).forEach(r=>{if(imgKey(r.key)&&typeof r.data==='string'&&r.data.startsWith('data:image/')){IMGS[r.key]=r.data;rt.imgs.add(r.key);}});
+      // zmiany lokalne niewysłane do bazy (np. wysyłka się nie udała albo powstały w trakcie pobierania) nie mogą zginąć
+      const pend=rt.loaded&&b.cloud.role!=='view'?localPending(rt,b):{up:[],del:[]};
       rt.synced.clear();rt.ts.clear();rt.z.clear();rt.remoteLive.clear();
       const els=[];
       for(const r of er.data||[]){const el=clean(r.data);if(!el)continue;el.id=String(r.id);els.push(el);rt.synced.set(el.id,JSON.stringify(el));rt.ts.set(el.id,Number(r.ts)||0);rt.z.set(el.id,Number(r.z)||0);}
-      b.els=els;hists.delete(b.id);save();
+      for(const u of pend.up){const i=els.findIndex(x=>x.id===u.id);if(i>=0)els[i]=u;else els.push(u);}
+      if(pend.del.length){const dl=new Set(pend.del);for(let i=els.length-1;i>=0;i--)if(dl.has(els[i].id))els.splice(i,1);}
+      overlay=pend.up.length>0||pend.del.length>0;
+      b.els=els;hists.delete(b.id);rt.loaded=true;save();
     }
     ensureImages(rt,b);
     attachChannels(rt);
@@ -3500,7 +3518,7 @@ async function cloudStart(b,{fetch=true}={}){
     if(board()===b){pruneSel();render();}
   }catch(e){setStatus(navigator.onLine===false?'offline':'error');toast('Nie udało się wczytać tablicy z chmury.');}
   finally{rt.starting=false;}
-  if(!fetch)cloudSchedule();
+  if(!fetch||overlay)cloudSchedule(); // dosyła zachowane zmiany lokalne
 }
 function attachChannels(rt){
   const sb=cloud.sb,cid=rt.cid;
